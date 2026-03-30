@@ -158,3 +158,95 @@ exports.getMe = async (req, res) => {
     return ApiResponse.success(res, { user: user.toJSON() });
   } catch (err) { return ApiResponse.error(res, err.message); }
 };
+
+const totpService = require('../services/totp.service');
+
+// ══════════════════════════════════════════════════════════
+// SETUP 2FA — POST /api/auth/2fa/setup
+// Returns QR code for Google Authenticator
+// ══════════════════════════════════════════════════════════
+exports.setup2FA = async (req, res) => {
+  try {
+    const user = await User.findById(req.userId);
+    if (!user) return ApiResponse.error(res, 'User not found', 404);
+    if (user.isTwoFactorEnabled) return ApiResponse.error(res, '2FA already enabled', 400);
+
+    const { base32, otpauthUrl } = totpService.generateTOTPSecret(user.email);
+    const qrCode = await totpService.generateQRCodeDataURL(otpauthUrl);
+
+    user.twoFactorSecret = base32;
+    await user.save();
+
+    return ApiResponse.success(res, { qrCode, manualKey: base32 }, 'Scan QR in Google Authenticator, then call /2fa/enable with a code.');
+  } catch (err) { return ApiResponse.error(res, err.message); }
+};
+
+// ══════════════════════════════════════════════════════════
+// ENABLE 2FA — POST /api/auth/2fa/enable
+// Body: { totpToken }
+// ══════════════════════════════════════════════════════════
+exports.enable2FA = async (req, res) => {
+  const { totpToken } = req.body;
+  if (!totpToken) return ApiResponse.error(res, 'TOTP code required', 400);
+  try {
+    const user = await User.findById(req.userId);
+    if (!user?.twoFactorSecret) return ApiResponse.error(res, 'Run /2fa/setup first', 400);
+
+    if (!totpService.verifyTOTPToken(user.twoFactorSecret, totpToken))
+      return ApiResponse.error(res, 'Invalid code. Check your phone clock.', 401);
+
+    user.isTwoFactorEnabled = true;
+    await user.save();
+    await auditService.log(user._id, 'TWO_FA_ENABLED', req);
+    return ApiResponse.success(res, null, '2FA enabled. Required on next login.');
+  } catch (err) { return ApiResponse.error(res, err.message); }
+};
+
+// ══════════════════════════════════════════════════════════
+// VERIFY 2FA LOGIN — POST /api/auth/2fa/verify
+// Called after password login when 2FA is enabled
+// Body: { userId, totpToken }   ← no JWT needed yet
+// ══════════════════════════════════════════════════════════
+exports.verify2FALogin = async (req, res) => {
+  const { userId, totpToken } = req.body;
+  if (!userId || !totpToken) return ApiResponse.error(res, 'userId and totpToken required', 400);
+  try {
+    const user = await User.findById(userId);
+    if (!user?.isTwoFactorEnabled) return ApiResponse.error(res, 'Invalid request', 400);
+
+    if (!totpService.verifyTOTPToken(user.twoFactorSecret, totpToken)) {
+      await auditService.log(user._id, 'LOGIN_FAILED', req, { reason: '2FA_INVALID' }, false);
+      return ApiResponse.error(res, 'Invalid 2FA code', 401);
+    }
+
+    const accessToken   = tokenService.generateAccessToken(user._id);
+    const refreshToken  = tokenService.generateRefreshToken();
+    const hashedRefresh = await tokenService.hashRefreshToken(refreshToken);
+    user.refreshTokens.push(hashedRefresh);
+    if (user.refreshTokens.length > 5) user.refreshTokens = user.refreshTokens.slice(-5);
+    await user.save();
+
+    setRefreshCookie(res, refreshToken);
+    await auditService.log(user._id, 'LOGIN', req);
+    return ApiResponse.success(res, { accessToken, user: user.toJSON(), encryptionSalt: user.encryptionSalt }, '2FA verified. Login successful.');
+  } catch (err) { return ApiResponse.error(res, err.message); }
+};
+
+// ══════════════════════════════════════════════════════════
+// DISABLE 2FA — POST /api/auth/2fa/disable
+// Body: { totpToken }  ← must confirm with current code to disable
+// ══════════════════════════════════════════════════════════
+exports.disable2FA = async (req, res) => {
+  const { totpToken } = req.body;
+  try {
+    const user = await User.findById(req.userId);
+    if (!user?.isTwoFactorEnabled) return ApiResponse.error(res, '2FA not enabled', 400);
+    if (!totpService.verifyTOTPToken(user.twoFactorSecret, totpToken))
+      return ApiResponse.error(res, 'Invalid TOTP code', 401);
+    user.isTwoFactorEnabled = false;
+    user.twoFactorSecret = null;
+    await user.save();
+    await auditService.log(user._id, 'TWO_FA_DISABLED', req);
+    return ApiResponse.success(res, null, '2FA disabled.');
+  } catch (err) { return ApiResponse.error(res, err.message); }
+};
