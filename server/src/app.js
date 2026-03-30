@@ -35,8 +35,14 @@ app.get('/health', (req, res) => {
   });
 });
 
-// ── Routes placeholder (added in later phases) ───────────
-// app.use('/api/auth',    authRoutes);
+// ── Routes ───────────────────────────────────────────────
+const authRoutes = require('./routes/auth.routes');
+app.use('/api/auth', authRoutes);
+
+// Uncommented in later phases:
+// const vaultRoutes   = require('./routes/vault.routes');
+// const apikeyRoutes  = require('./routes/apikey.routes');
+// const auditRoutes   = require('./routes/audit.routes');
 // app.use('/api/vault',   vaultRoutes);
 // app.use('/api/apikeys', apikeyRoutes);
 // app.use('/api/audit',   auditRoutes);
