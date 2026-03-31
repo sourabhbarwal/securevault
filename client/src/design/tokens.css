@@ -1,0 +1,64 @@
+:root {
+  /* ── Colors ─────────────────────────────────────────────── */
+  --bg-root:          #04060F;
+  --bg-surface:       #080D1E;
+  --bg-card:          #0C1428;
+  --bg-card-hover:    #101B34;
+
+  --primary:          #7EFFF5;
+  --primary-dim:      rgba(126, 255, 245, 0.12);
+  --primary-glow:     rgba(126, 255, 245, 0.35);
+  --primary-border:   rgba(126, 255, 245, 0.25);
+
+  --accent:           #FF3CAC;
+  --accent-dim:       rgba(255, 60, 172, 0.12);
+  --accent-glow:      rgba(255, 60, 172, 0.35);
+  --accent-border:    rgba(255, 60, 172, 0.25);
+
+  --lime:             #C8FF57;
+  --lime-dim:         rgba(200, 255, 87, 0.12);
+  --lime-border:      rgba(200, 255, 87, 0.25);
+
+  --purple:           #a78bfa;
+  --purple-dim:       rgba(167, 139, 250, 0.12);
+
+  --border:           rgba(126, 255, 245, 0.08);
+  --border-hover:     rgba(126, 255, 245, 0.22);
+
+  --text-primary:     #E8EDF8;
+  --text-secondary:   #7A8AAD;
+  --text-muted:       #3D4F70;
+
+  /* ── Typography ─────────────────────────────────────────── */
+  --font-display:     'Syne', sans-serif;
+  --font-body:        'Satoshi', sans-serif;
+  --font-mono:        'JetBrains Mono', monospace;
+
+  /* ── Spacing & Radius ────────────────────────────────────── */
+  --radius-xs:        4px;
+  --radius-sm:        6px;
+  --radius-md:        12px;
+  --radius-lg:        20px;
+  --radius-xl:        32px;
+  --radius-full:      9999px;
+
+  /* ── Glass ───────────────────────────────────────────────── */
+  --glass-bg:         rgba(12, 20, 40, 0.65);
+  --glass-blur:       20px;
+  --glass-border:     rgba(126, 255, 245, 0.08);
+
+  /* ── Shadows ─────────────────────────────────────────────── */
+  --shadow-sm:        0 4px 16px rgba(0, 0, 0, 0.3);
+  --shadow-card:      0 8px 40px rgba(0, 0, 0, 0.5);
+  --shadow-elevated:  0 20px 80px rgba(0, 0, 0, 0.7);
+  --shadow-glow-cyan: 0 0 40px rgba(126, 255, 245, 0.15);
+  --shadow-glow-pink: 0 0 40px rgba(255, 60, 172, 0.15);
+
+  /* ── Transitions ─────────────────────────────────────────── */
+  --ease-bounce:      cubic-bezier(0.34, 1.56, 0.64, 1);
+  --ease-smooth:      cubic-bezier(0.25, 0.46, 0.45, 0.94);
+  --ease-sharp:       cubic-bezier(0.4, 0, 0.2, 1);
+  --dur-fast:         150ms;
+  --dur-normal:       300ms;
+  --dur-slow:         600ms;
+}
