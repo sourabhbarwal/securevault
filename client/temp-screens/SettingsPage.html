@@ -1,0 +1,308 @@
+<!DOCTYPE html>
+
+<html class="dark" lang="en"><head>
+<meta charset="utf-8"/>
+<meta content="width=device-width, initial-scale=1.0" name="viewport"/>
+<title>SecureVault - Security Settings</title>
+<script src="https://cdn.tailwindcss.com?plugins=forms,container-queries"></script>
+<link href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@300;400;500;600;700;800;900&amp;family=Manrope:wght@200;300;400;500;600;700;800&amp;family=JetBrains+Mono:wght@400;500;700&amp;display=swap" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet"/>
+<script id="tailwind-config">
+        tailwind.config = {
+            darkMode: "class",
+            theme: {
+                extend: {
+                    colors: {
+                        "surface-container-lowest": "#000000",
+                        "outline": "#737582",
+                        "primary-dim": "#5fe3d9",
+                        "on-tertiary-container": "#445f00",
+                        "on-secondary": "#45002a",
+                        "secondary-fixed-dim": "#ffabcf",
+                        "on-secondary-container": "#fff5f7",
+                        "inverse-on-surface": "#525461",
+                        "primary": "#6ff1e7",
+                        "on-background": "#ecedfc",
+                        "on-primary-container": "#002826",
+                        "on-tertiary": "#4a6800",
+                        "error-dim": "#d7383b",
+                        "secondary": "#ff66b5",
+                        "secondary-container": "#b60076",
+                        "tertiary-fixed": "#c6fd55",
+                        "primary-container": "#17b3aa",
+                        "on-tertiary-fixed": "#354b00",
+                        "tertiary-container": "#c6fd55",
+                        "on-error": "#490006",
+                        "tertiary-dim": "#b9ee48",
+                        "surface-container-low": "#10131e",
+                        "on-surface": "#ecedfc",
+                        "outline-variant": "#454753",
+                        "inverse-surface": "#faf8ff",
+                        "background": "#0b0e18",
+                        "surface": "#0b0e18",
+                        "primary-fixed": "#6ff1e7",
+                        "surface-dim": "#0b0e18",
+                        "on-tertiary-fixed-variant": "#4c6a00",
+                        "on-error-container": "#ffa8a3",
+                        "error": "#ff716c",
+                        "on-secondary-fixed-variant": "#9d0065",
+                        "on-primary": "#005854",
+                        "on-secondary-fixed": "#6a0043",
+                        "surface-container-high": "#1b1f2c",
+                        "surface-container": "#161925",
+                        "secondary-dim": "#ff66b5",
+                        "surface-container-highest": "#212534",
+                        "on-primary-fixed-variant": "#00635e",
+                        "primary-fixed-dim": "#5fe3d9",
+                        "on-surface-variant": "#a9aab8",
+                        "tertiary-fixed-dim": "#b9ee48",
+                        "tertiary": "#f2ffd1",
+                        "surface-bright": "#272c3b",
+                        "inverse-primary": "#006b65",
+                        "error-container": "#9f0519",
+                        "surface-tint": "#6ff1e7",
+                        "surface-variant": "#212534",
+                        "secondary-fixed": "#ffc0d9",
+                        "on-primary-fixed": "#004440"
+                    },
+                    fontFamily: {
+                        "headline": ["Space Grotesk"],
+                        "body": ["Manrope"],
+                        "label": ["Space Grotesk"],
+                        "mono": ["JetBrains Mono"]
+                    },
+                    borderRadius: {"DEFAULT": "0.125rem", "lg": "0.25rem", "xl": "0.5rem", "full": "0.75rem"},
+                },
+            },
+        }
+    </script>
+<style>
+        body {
+            background-color: #0b0e18;
+            background-image: 
+                radial-gradient(circle at 10% 20%, rgba(111, 241, 231, 0.08) 0%, transparent 40%),
+                radial-gradient(circle at 90% 80%, rgba(255, 102, 181, 0.08) 0%, transparent 40%);
+            min-height: 100vh;
+            color: #ecedfc;
+        }
+        .material-symbols-outlined {
+            font-variation-settings: 'FILL' 0, 'wght' 400, 'GRAD' 0, 'opsz' 24;
+        }
+        .glass-card {
+            backdrop-filter: blur(20px);
+            background: rgba(27, 31, 44, 0.6);
+            border: 1px solid rgba(115, 117, 130, 0.1);
+        }
+        .aurora-blur {
+            position: fixed;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            z-index: -1;
+            overflow: hidden;
+            pointer-events: none;
+        }
+        .particle {
+            position: absolute;
+            width: 2px;
+            height: 2px;
+            background: rgba(111, 241, 231, 0.3);
+            border-radius: 50%;
+        }
+    </style>
+</head>
+<body class="font-body selection:bg-primary/30">
+<div class="aurora-blur">
+<div class="particle" style="top: 15%; left: 25%;"></div>
+<div class="particle" style="top: 45%; left: 85%;"></div>
+<div class="particle" style="top: 75%; left: 15%;"></div>
+<div class="particle" style="top: 25%; left: 65%;"></div>
+<div class="particle" style="top: 85%; left: 45%;"></div>
+</div>
+<!-- TopAppBar -->
+<header class="bg-[#0b0e18]/80 backdrop-blur-lg border-b border-white/5 shadow-[0_8px_32px_0_rgba(0,0,0,0.37)] docked full-width top-0 z-50 flex justify-between items-center px-8 py-4 w-full sticky">
+<div class="flex items-center gap-3">
+<span class="material-symbols-outlined text-[#7EFFF5]" style="font-variation-settings: 'FILL' 1;">lock</span>
+<span class="text-2xl font-black bg-gradient-to-br from-[#6ff1e7] to-[#17b3aa] bg-clip-text text-transparent font-['Space_Grotesk'] tracking-tight">SecureVault</span>
+</div>
+<div class="hidden md:flex items-center gap-8">
+<nav class="flex gap-6">
+<a class="text-slate-400 font-medium hover:text-[#7EFFF5] transition-all duration-300 font-['Space_Grotesk']" href="#">Vaults</a>
+<a class="text-slate-400 font-medium hover:text-[#7EFFF5] transition-all duration-300 font-['Space_Grotesk']" href="#">Audit Log</a>
+<a class="text-[#7EFFF5] border-b-2 border-[#7EFFF5] pb-1 font-bold font-['Space_Grotesk']" href="#">Preferences</a>
+</nav>
+<div class="flex items-center gap-4 border-l border-white/10 pl-8">
+<span class="material-symbols-outlined text-slate-400 cursor-pointer hover:text-[#7EFFF5] transition-colors">notifications</span>
+<span class="material-symbols-outlined text-slate-400 cursor-pointer hover:text-[#7EFFF5] transition-colors">settings</span>
+<div class="w-8 h-8 rounded-full overflow-hidden border border-primary/20">
+<img alt="User Avatar" class="w-full h-full object-cover" data-alt="close-up portrait of a high-tech digital security avatar with glowing circuitry patterns and teal lighting" src="https://lh3.googleusercontent.com/aida-public/AB6AXuBG9_CFbdqUFSfosY0nAAQq8gDMIjwaBoYp-dhnxjtMHJvbffXiJDYwF7YW5vyxpiFFiedshON_FcWY9RCLL2fyWl7nZITbqwsiS8QCkd6_r0BZpdd6suDtomgU_U-SYxPtSHYENtpQFYoa-Sayw6aW9POu7chIXmTRS2clVNQvWporBi3n_48ThQLiAK2HP6nwq9mGQeTGWUSpnKlLAgVo5TWsJdwFG9nfK77VypZByJUqm8ZU67U5P9R0vfOgg6WWlPAL7bIg09Y"/>
+</div>
+</div>
+</div>
+</header>
+<div class="flex">
+<!-- SideNavBar -->
+<aside class="bg-[#0b0e18]/40 backdrop-blur-2xl border-r border-white/5 shadow-[20px_0_40px_rgba(0,0,0,0.4)] fixed left-0 top-[72px] h-[calc(100vh-72px)] w-72 rounded-r-xl z-40 hidden lg:flex flex-col gap-2 pt-8">
+<div class="px-8 mb-8">
+<h2 class="text-[#7EFFF5] text-xl font-bold font-['Space_Grotesk']">The Observer</h2>
+<p class="text-slate-500 text-xs tracking-[0.2em] uppercase font-bold">Quantum-Encrypted</p>
+</div>
+<nav class="flex flex-col gap-1">
+<a class="text-slate-500 px-6 py-3 hover:bg-white/5 hover:text-slate-200 transition-colors duration-200 flex items-center gap-4 font-['Space_Grotesk'] text-sm tracking-wide group" href="#">
+<span class="material-symbols-outlined group-hover:translate-x-1 transition-transform duration-300">enhanced_encryption</span>
+<span>Vaults</span>
+</a>
+<a class="text-slate-500 px-6 py-3 hover:bg-white/5 hover:text-slate-200 transition-colors duration-200 flex items-center gap-4 font-['Space_Grotesk'] text-sm tracking-wide group" href="#">
+<span class="material-symbols-outlined group-hover:translate-x-1 transition-transform duration-300">terminal</span>
+<span>Audit Log</span>
+</a>
+<a class="text-slate-500 px-6 py-3 hover:bg-white/5 hover:text-slate-200 transition-colors duration-200 flex items-center gap-4 font-['Space_Grotesk'] text-sm tracking-wide group" href="#">
+<span class="material-symbols-outlined group-hover:translate-x-1 transition-transform duration-300">shield_lock</span>
+<span>Security Tools</span>
+</a>
+<a class="text-slate-500 px-6 py-3 hover:bg-white/5 hover:text-slate-200 transition-colors duration-200 flex items-center gap-4 font-['Space_Grotesk'] text-sm tracking-wide group" href="#">
+<span class="material-symbols-outlined group-hover:translate-x-1 transition-transform duration-300">group_work</span>
+<span>Shared Items</span>
+</a>
+<a class="bg-gradient-to-r from-[#7EFFF5]/10 to-transparent text-[#7EFFF5] border-l-4 border-[#7EFFF5] px-6 py-3 font-bold flex items-center gap-4 font-['Space_Grotesk'] text-sm tracking-wide" href="#">
+<span class="material-symbols-outlined" style="font-variation-settings: 'FILL' 1;">settings_suggest</span>
+<span>Preferences</span>
+</a>
+</nav>
+<div class="mt-auto p-6">
+<button class="w-full py-3 bg-secondary-container text-on-secondary-container font-black text-xs uppercase tracking-widest rounded-lg hover:opacity-90 active:scale-95 transition-all">
+                    Lock All Vaults
+                </button>
+</div>
+</aside>
+<!-- Main Canvas -->
+<main class="flex-1 lg:ml-72 p-8 md:p-12 max-w-7xl">
+<header class="mb-12">
+<h1 class="text-5xl font-black font-headline tracking-tighter mb-4">Security Preferences</h1>
+<p class="text-on-surface-variant max-w-2xl leading-relaxed">Configure your quantum-level defense parameters. All changes are propagated through the neural encrypted mesh instantly.</p>
+</header>
+<!-- Bento Grid Layout -->
+<div class="grid grid-cols-1 md:grid-cols-12 gap-8">
+<!-- 2FA Control Panel -->
+<section class="md:col-span-4 glass-card p-8 rounded-xl flex flex-col justify-between">
+<div>
+<div class="flex items-center gap-3 mb-6">
+<span class="material-symbols-outlined text-tertiary-fixed text-3xl">vibration</span>
+<h3 class="font-headline font-bold text-xl uppercase tracking-wider">Multi-Factor</h3>
+</div>
+<p class="text-on-surface-variant text-sm mb-8">Hardware-backed authentication using biometric keys and TOTP synchronization.</p>
+</div>
+<div class="space-y-4">
+<div class="flex items-center justify-between p-4 bg-surface-container-lowest rounded-lg border border-white/5">
+<span class="text-sm font-medium">Authenticator App</span>
+<div class="w-12 h-6 bg-tertiary-container rounded-full relative flex items-center px-1 shadow-[0_0_10px_rgba(198,253,85,0.3)]">
+<div class="w-4 h-4 bg-on-tertiary-container rounded-full ml-auto"></div>
+</div>
+</div>
+<div class="flex items-center justify-between p-4 bg-surface-container-lowest rounded-lg border border-white/5">
+<span class="text-sm font-medium">YubiKey Support</span>
+<div class="w-12 h-6 bg-surface-variant rounded-full relative flex items-center px-1">
+<div class="w-4 h-4 bg-outline rounded-full"></div>
+</div>
+</div>
+</div>
+</section>
+<!-- API Key Management -->
+<section class="md:col-span-8 glass-card p-8 rounded-xl overflow-hidden">
+<div class="flex items-center justify-between mb-8">
+<div class="flex items-center gap-3">
+<span class="material-symbols-outlined text-primary text-3xl">api</span>
+<h3 class="font-headline font-bold text-xl uppercase tracking-wider">Neural API Nodes</h3>
+</div>
+<button class="bg-gradient-to-br from-primary to-primary-container text-on-primary-fixed font-black text-xs uppercase px-6 py-2 rounded-md hover:shadow-[0_0_15px_rgba(111,241,231,0.4)] transition-all">
+                            Generate Node
+                        </button>
+</div>
+<div class="overflow-x-auto">
+<table class="w-full text-left border-separate border-spacing-y-3">
+<thead>
+<tr class="text-on-surface-variant text-xs uppercase tracking-widest font-bold">
+<th class="pb-2 pl-4">Node Name</th>
+<th class="pb-2">Encrypted Secret</th>
+<th class="pb-2">Access Level</th>
+<th class="pb-2 text-right pr-4">Control</th>
+</tr>
+</thead>
+<tbody>
+<tr class="bg-surface-container-lowest group hover:bg-surface-container-low transition-colors rounded-xl">
+<td class="py-4 pl-4 rounded-l-xl font-bold text-primary">Production_Main</td>
+<td class="py-4 font-mono text-xs opacity-60">sv_live_72kX92m...P8z1</td>
+<td class="py-4"><span class="px-2 py-1 bg-primary/10 text-primary text-[10px] rounded border border-primary/20">Read/Write</span></td>
+<td class="py-4 text-right pr-4 rounded-r-xl">
+<span class="material-symbols-outlined text-outline cursor-pointer hover:text-error transition-colors">delete</span>
+</td>
+</tr>
+<tr class="bg-surface-container-lowest group hover:bg-surface-container-low transition-colors">
+<td class="py-4 pl-4 rounded-l-xl font-bold text-primary">Observer_Analytics</td>
+<td class="py-4 font-mono text-xs opacity-60">sv_live_44nP11q...R2a5</td>
+<td class="py-4"><span class="px-2 py-1 bg-outline-variant/30 text-outline text-[10px] rounded border border-outline-variant">Read Only</span></td>
+<td class="py-4 text-right pr-4 rounded-r-xl">
+<span class="material-symbols-outlined text-outline cursor-pointer hover:text-error transition-colors">delete</span>
+</td>
+</tr>
+</tbody>
+</table>
+</div>
+</section>
+<!-- Audit Log Terminal -->
+<section class="md:col-span-12 glass-card p-8 rounded-xl relative overflow-hidden">
+<div class="flex items-center gap-3 mb-8">
+<span class="material-symbols-outlined text-secondary text-3xl">history_edu</span>
+<h3 class="font-headline font-bold text-xl uppercase tracking-wider">Recent Telemetry</h3>
+</div>
+<div class="bg-surface-container-lowest p-6 rounded-lg font-mono text-sm leading-loose border border-white/5 max-h-80 overflow-y-auto custom-scrollbar">
+<div class="flex gap-4 border-l-2 border-primary pl-4 mb-2 hover:bg-primary/5 transition-colors py-1 group">
+<span class="text-outline shrink-0">14:22:09</span>
+<span class="text-primary-dim">[SUCCESS]</span>
+<span class="text-on-surface">Vault "Project-Alpha" accessed by Node:Production_Main. IP: 192.168.1.42</span>
+<span class="ml-auto opacity-0 group-hover:opacity-100 transition-opacity text-primary-dim text-xs">VERIFIED</span>
+</div>
+<div class="flex gap-4 border-l-2 border-error pl-4 mb-2 hover:bg-error/5 transition-colors py-1 group">
+<span class="text-outline shrink-0">13:58:12</span>
+<span class="text-error">[DENIED]</span>
+<span class="text-on-surface">Invalid 2FA challenge response from unauthorized device: Nexus-7.</span>
+<span class="ml-auto opacity-0 group-hover:opacity-100 transition-opacity text-error text-xs">FLAGGED</span>
+</div>
+<div class="flex gap-4 border-l-2 border-secondary pl-4 mb-2 hover:bg-secondary/5 transition-colors py-1 group">
+<span class="text-outline shrink-0">11:04:45</span>
+<span class="text-secondary">[UPDATE]</span>
+<span class="text-on-surface">System Preferences changed: Multi-Factor Authentication strategy adjusted.</span>
+<span class="ml-auto opacity-0 group-hover:opacity-100 transition-opacity text-secondary text-xs">COMMITTED</span>
+</div>
+<div class="flex gap-4 border-l-2 border-primary pl-4 mb-2 hover:bg-primary/5 transition-colors py-1 group">
+<span class="text-outline shrink-0">09:15:33</span>
+<span class="text-primary-dim">[SUCCESS]</span>
+<span class="text-on-surface">Database encryption keys rotated successfully. Quantum-safe entropy confirmed.</span>
+<span class="ml-auto opacity-0 group-hover:opacity-100 transition-opacity text-primary-dim text-xs">VERIFIED</span>
+</div>
+<div class="flex gap-4 border-l-2 border-outline pl-4 mb-2 hover:bg-white/5 transition-colors py-1 group">
+<span class="text-outline shrink-0">08:00:01</span>
+<span class="text-outline">[SYSTEM]</span>
+<span class="text-on-surface">Daily security posture scan completed. 0 vulnerabilities detected.</span>
+<span class="ml-auto opacity-0 group-hover:opacity-100 transition-opacity text-outline text-xs">IDLE</span>
+</div>
+</div>
+</section>
+</div>
+</main>
+</div>
+<!-- Mobile Nav (Suppressed for Settings page per instructions, using simple context) -->
+<div class="md:hidden fixed bottom-6 left-1/2 -translate-x-1/2 flex gap-4 glass-card p-3 rounded-full shadow-2xl border border-primary/20">
+<button class="w-12 h-12 flex items-center justify-center text-primary-dim hover:text-primary transition-colors">
+<span class="material-symbols-outlined">enhanced_encryption</span>
+</button>
+<button class="w-12 h-12 flex items-center justify-center text-primary-dim hover:text-primary transition-colors">
+<span class="material-symbols-outlined">terminal</span>
+</button>
+<button class="w-12 h-12 flex items-center justify-center bg-primary text-on-primary rounded-full shadow-[0_0_20px_rgba(111,241,231,0.5)]">
+<span class="material-symbols-outlined" style="font-variation-settings: 'FILL' 1;">settings_suggest</span>
+</button>
+</div>
+</body></html>

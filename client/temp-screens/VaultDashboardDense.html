@@ -1,0 +1,486 @@
+<!DOCTYPE html>
+
+<html class="dark" lang="en"><head>
+<meta charset="utf-8"/>
+<meta content="width=device-width, initial-scale=1.0" name="viewport"/>
+<title>SecureVault | Quantum-Encrypted Dashboard</title>
+<script src="https://cdn.tailwindcss.com?plugins=forms,container-queries"></script>
+<link href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@300;400;500;600;700;800;900&amp;family=Manrope:wght@200;300;400;500;600;700;800&amp;family=JetBrains+Mono:wght@400;500&amp;family=Syne:wght@400;500;600;700;800&amp;display=swap" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet"/>
+<script id="tailwind-config">
+        tailwind.config = {
+            darkMode: "class",
+            theme: {
+                extend: {
+                    colors: {
+                        "surface-container-lowest": "#000000",
+                        "outline": "#737582",
+                        "primary-dim": "#5fe3d9",
+                        "on-tertiary-container": "#445f00",
+                        "on-secondary": "#45002a",
+                        "secondary-fixed-dim": "#ffabcf",
+                        "on-secondary-container": "#fff5f7",
+                        "inverse-on-surface": "#525461",
+                        "primary": "#6ff1e7",
+                        "on-background": "#ecedfc",
+                        "on-primary-container": "#002826",
+                        "on-tertiary": "#4a6800",
+                        "error-dim": "#d7383b",
+                        "secondary": "#ff66b5",
+                        "secondary-container": "#b60076",
+                        "tertiary-fixed": "#c6fd55",
+                        "primary-container": "#17b3aa",
+                        "on-tertiary-fixed": "#354b00",
+                        "tertiary-container": "#c6fd55",
+                        "on-error": "#490006",
+                        "tertiary-dim": "#b9ee48",
+                        "surface-container-low": "#10131e",
+                        "on-surface": "#ecedfc",
+                        "outline-variant": "#454753",
+                        "inverse-surface": "#faf8ff",
+                        "background": "#0b0e18",
+                        "surface": "#0b0e18",
+                        "primary-fixed": "#6ff1e7",
+                        "surface-dim": "#0b0e18",
+                        "on-tertiary-fixed-variant": "#4c6a00",
+                        "on-error-container": "#ffa8a3",
+                        "error": "#ff716c",
+                        "on-secondary-fixed-variant": "#9d0065",
+                        "on-primary": "#005854",
+                        "on-secondary-fixed": "#6a0043",
+                        "surface-container-high": "#1b1f2c",
+                        "surface-container": "#161925",
+                        "secondary-dim": "#ff66b5",
+                        "surface-container-highest": "#212534",
+                        "on-primary-fixed-variant": "#00635e",
+                        "primary-fixed-dim": "#5fe3d9",
+                        "on-surface-variant": "#a9aab8",
+                        "tertiary-fixed-dim": "#b9ee48",
+                        "tertiary": "#f2ffd1",
+                        "surface-bright": "#272c3b",
+                        "inverse-primary": "#006b65",
+                        "error-container": "#9f0519",
+                        "surface-tint": "#6ff1e7",
+                        "surface-variant": "#212534",
+                        "secondary-fixed": "#ffc0d9",
+                        "on-primary-fixed": "#004440"
+                    },
+                    fontFamily: {
+                        "headline": ["Syne", "sans-serif"],
+                        "body": ["Manrope", "sans-serif"],
+                        "label": ["Space Grotesk", "sans-serif"],
+                        "mono": ["JetBrains Mono", "monospace"]
+                    },
+                    borderRadius: {"DEFAULT": "0.125rem", "lg": "0.25rem", "xl": "0.5rem", "full": "0.75rem"},
+                },
+            },
+        }
+    </script>
+<style>
+        body {
+            background-color: #0b0e18;
+            color: #ecedfc;
+            font-family: 'Manrope', sans-serif;
+            overflow-x: hidden;
+        }
+        .aurora-bg {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            z-index: -1;
+            background: 
+                radial-gradient(circle at 20% 30%, rgba(111, 241, 231, 0.08) 0%, transparent 40%),
+                radial-gradient(circle at 80% 70%, rgba(255, 102, 181, 0.08) 0%, transparent 40%);
+        }
+        .particle-dots {
+            background-image: radial-gradient(rgba(236, 237, 252, 0.1) 1px, transparent 1px);
+            background-size: 40px 40px;
+        }
+        .vault-card {
+            backdrop-filter: blur(20px);
+            transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+            border: 1px solid rgba(255, 255, 255, 0.05);
+        }
+        .vault-card:hover {
+            background-color: rgba(111, 241, 231, 0.05);
+            transform: translateY(-4px);
+            border-color: rgba(111, 241, 231, 0.3);
+            box-shadow: 0 10px 30px -10px rgba(111, 241, 231, 0.2);
+        }
+        .material-symbols-outlined {
+            font-variation-settings: 'FILL' 0, 'wght' 400, 'GRAD' 0, 'opsz' 24;
+            vertical-align: middle;
+        }
+    </style>
+</head>
+<body class="font-body selection:bg-primary/30">
+<div class="aurora-bg"></div>
+<div class="fixed inset-0 particle-dots pointer-events-none z-0"></div>
+<!-- TopAppBar -->
+<header class="bg-[#0b0e18]/80 backdrop-blur-lg docked full-width top-0 z-50 border-b border-white/5 shadow-[0_8px_32px_0_rgba(0,0,0,0.37)] flex justify-between items-center px-8 py-4 w-full sticky">
+<div class="flex items-center gap-3">
+<span class="material-symbols-outlined text-[#7EFFF5] text-3xl" data-icon="lock">lock</span>
+<span class="text-2xl font-black bg-gradient-to-br from-[#6ff1e7] to-[#17b3aa] bg-clip-text text-transparent font-['Space_Grotesk'] tracking-tight">SecureVault</span>
+</div>
+<div class="hidden md:flex items-center gap-8">
+<nav class="flex items-center gap-6">
+<a class="text-[#7EFFF5] border-b-2 border-[#7EFFF5] pb-1 font-['Space_Grotesk'] font-bold tracking-tight transition-all duration-300" href="#">Vaults</a>
+<a class="text-slate-400 font-medium font-['Space_Grotesk'] hover:text-[#7EFFF5] transition-all duration-300" href="#">Audit Log</a>
+<a class="text-slate-400 font-medium font-['Space_Grotesk'] hover:text-[#7EFFF5] transition-all duration-300" href="#">Tools</a>
+</nav>
+<div class="h-8 w-[1px] bg-white/10 mx-2"></div>
+<div class="flex items-center gap-4">
+<button class="text-slate-400 hover:text-[#7EFFF5] transition-all"><span class="material-symbols-outlined" data-icon="notifications">notifications</span></button>
+<button class="text-slate-400 hover:text-[#7EFFF5] transition-all"><span class="material-symbols-outlined" data-icon="settings">settings</span></button>
+<div class="w-10 h-10 rounded-full overflow-hidden border border-primary/20">
+<img alt="User Avatar" class="w-full h-full object-cover" data-alt="Cyberpunk style profile avatar of a security professional with glowing blue accents and high-tech visor" src="https://lh3.googleusercontent.com/aida-public/AB6AXuAkFviRK1ADe_w1HnWY_oSSP-tMgjxfOPw9InvycQ8LlGj4ihlz_oMnte-ePq3XfoPvoRVOedIqJcEWzcFGUPn0EzgfJNkNFuCXvuxDOQvJ77ojXuXzGij6R3sQhHqZP6BGQhEBoM_GEol92b_PgX8yM6Id_dkWUMCge7yKTDoXy2AZ__j7d4GPVKyYw5WIdSmJbhsNiyUymoR8mjNSp7a17ZLctLA_j6GotiP2Fq7Ubonc9NlDAUi7lDrkF_DM-K8RnydtwGYnXIQ"/>
+</div>
+</div>
+</div>
+</header>
+<div class="flex min-h-screen">
+<!-- SideNavBar -->
+<aside class="bg-[#0b0e18]/40 backdrop-blur-2xl fixed left-0 top-[72px] h-[calc(100vh-72px)] w-72 rounded-r-xl border-r border-white/5 shadow-[20px_0_40px_rgba(0,0,0,0.4)] z-40 hidden md:flex flex-col">
+<div class="px-8 pt-8 pb-4">
+<h2 class="text-[#7EFFF5] text-xl font-bold font-['Space_Grotesk'] tracking-wide">The Observer</h2>
+<p class="text-slate-500 text-xs uppercase tracking-widest mt-1">Quantum-Encrypted</p>
+</div>
+<nav class="flex flex-col gap-2 pt-4">
+<div class="px-4 mb-2">
+<p class="text-[10px] text-outline uppercase font-bold tracking-[0.2em] px-4 pb-2">Primary Domains</p>
+<a class="bg-gradient-to-r from-[#7EFFF5]/10 to-transparent text-[#7EFFF5] border-l-4 border-[#7EFFF5] px-6 py-3 font-bold flex items-center gap-3 group transition-transform duration-300 translate-x-1" href="#">
+<span class="material-symbols-outlined" data-icon="enhanced_encryption">enhanced_encryption</span>
+<span class="font-['Space_Grotesk'] text-sm tracking-wide">Vaults</span>
+</a>
+<a class="text-slate-500 px-6 py-3 hover:bg-white/5 hover:text-slate-200 flex items-center gap-3 transition-colors duration-200" href="#">
+<span class="material-symbols-outlined" data-icon="terminal">terminal</span>
+<span class="font-['Space_Grotesk'] text-sm tracking-wide">Audit Log</span>
+</a>
+<a class="text-slate-500 px-6 py-3 hover:bg-white/5 hover:text-slate-200 flex items-center gap-3 transition-colors duration-200" href="#">
+<span class="material-symbols-outlined" data-icon="shield_lock">shield_lock</span>
+<span class="font-['Space_Grotesk'] text-sm tracking-wide">Security Tools</span>
+</a>
+</div>
+<div class="px-4 mt-4">
+<p class="text-[10px] text-outline uppercase font-bold tracking-[0.2em] px-4 pb-2">Categories</p>
+<a class="text-slate-500 px-6 py-2 hover:text-primary flex items-center gap-3 transition-colors text-sm" href="#">
+<span class="w-1.5 h-1.5 rounded-full bg-primary shadow-[0_0_8px_rgba(111,241,231,0.6)]"></span> Personal
+                </a>
+<a class="text-slate-500 px-6 py-2 hover:text-secondary flex items-center gap-3 transition-colors text-sm" href="#">
+<span class="w-1.5 h-1.5 rounded-full bg-secondary shadow-[0_0_8px_rgba(255,102,181,0.6)]"></span> Work Projects
+                </a>
+<a class="text-slate-500 px-6 py-2 hover:text-tertiary-container flex items-center gap-3 transition-colors text-sm" href="#">
+<span class="w-1.5 h-1.5 rounded-full bg-tertiary-container shadow-[0_0_8px_rgba(198,253,85,0.6)]"></span> Crypto Assets
+                </a>
+</div>
+</nav>
+<div class="mt-auto p-8">
+<button class="w-full py-3 px-4 bg-secondary-container text-on-secondary-container rounded-lg font-bold text-xs uppercase tracking-widest hover:opacity-90 active:scale-95 transition-all shadow-lg shadow-secondary/20">
+                Lock All Vaults
+            </button>
+</div>
+</aside>
+<!-- Main Content Area -->
+<main class="flex-1 ml-0 md:ml-72 p-8 md:p-12 relative z-10">
+<header class="mb-12 flex justify-between items-end">
+<div>
+<h1 class="text-5xl md:text-6xl font-headline font-extrabold tracking-tighter text-on-surface mb-2">Primary Vault</h1>
+<p class="text-on-surface-variant max-w-md text-lg font-light">Managing 24 encrypted secrets across 4 global clusters.</p>
+</div>
+<div class="flex gap-4">
+<div class="bg-surface-container-low px-4 py-2 rounded-xl flex items-center gap-3 border border-white/5">
+<span class="text-primary text-xs font-bold uppercase tracking-widest">Security Score</span>
+<div class="w-32 h-1.5 bg-white/10 rounded-full overflow-hidden">
+<div class="h-full bg-gradient-to-r from-primary to-primary-container w-[92%]"></div>
+</div>
+<span class="font-mono text-primary text-sm">92%</span>
+</div>
+</div>
+</header>
+<!-- Search and Filter Bar -->
+<div class="mb-8 flex flex-col md:flex-row gap-4 items-center">
+<div class="relative flex-1 w-full">
+<span class="material-symbols-outlined absolute left-4 top-1/2 -translate-y-1/2 text-outline" data-icon="search">search</span>
+<input class="w-full bg-surface-container-lowest border-none ring-1 ring-outline/20 focus:ring-2 focus:ring-primary/40 rounded-xl py-4 pl-12 pr-4 font-mono text-sm placeholder:text-outline/50 text-primary transition-all" placeholder="Search secrets by name, URL, or tag..." type="text"/>
+</div>
+<div class="flex gap-2">
+<button class="bg-surface-container-high px-6 py-4 rounded-xl border border-white/5 hover:bg-surface-variant transition-colors flex items-center gap-2">
+<span class="material-symbols-outlined text-sm" data-icon="filter_list">filter_list</span>
+<span class="text-sm font-label">Filter</span>
+</button>
+<button class="bg-surface-container-high px-6 py-4 rounded-xl border border-white/5 hover:bg-surface-variant transition-colors flex items-center gap-2">
+<span class="material-symbols-outlined text-sm" data-icon="sort">sort</span>
+<span class="text-sm font-label">Sort</span>
+</button>
+</div>
+</div>
+<!-- Secrets Grid List -->
+<div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-5">
+<!-- Card 1 -->
+<div class="vault-card group bg-surface-container-low/40 rounded-2xl p-5 flex flex-col relative">
+<div class="flex justify-between items-start mb-4">
+<div class="w-10 h-10 rounded-lg bg-primary/10 flex items-center justify-center border border-primary/20">
+<span class="material-symbols-outlined text-primary text-xl" data-icon="cloud">cloud</span>
+</div>
+<div class="flex flex-col items-end gap-2">
+<span class="px-2 py-0.5 rounded-full text-[8px] bg-primary/10 text-primary border border-primary/20 font-bold uppercase tracking-widest">Encrypted</span>
+<span class="px-2 py-0.5 rounded text-[10px] bg-secondary/10 text-secondary border border-secondary/20 font-bold uppercase tracking-wider">Work</span>
+</div>
+</div>
+<div class="mb-4">
+<div class="flex items-center gap-2 mb-1">
+<span class="material-symbols-outlined text-outline text-sm" data-icon="lock">lock</span>
+<h3 class="font-headline font-bold text-base text-on-surface truncate">AWS Master Console</h3>
+</div>
+<p class="text-on-surface-variant text-xs font-body truncate">console.aws.amazon.com/iam/home</p>
+</div>
+<div class="mt-auto pt-4 border-t border-white/5 flex flex-col gap-2">
+<div class="flex justify-between items-center">
+<p class="text-[10px] text-outline uppercase font-bold">Username</p>
+<p class="font-mono text-xs text-on-surface">admin_root_nexus</p>
+</div>
+<div class="flex justify-between items-center">
+<div class="flex items-center gap-2">
+<button class="text-outline hover:text-primary transition-colors"><span class="material-symbols-outlined text-lg" data-icon="content_copy">content_copy</span></button>
+<button class="text-outline hover:text-secondary transition-colors"><span class="material-symbols-outlined text-lg" data-icon="open_in_new">open_in_new</span></button>
+</div>
+<div class="flex items-center gap-1">
+<span class="text-on-surface tracking-widest text-[10px]">• • • • • •</span>
+<span class="material-symbols-outlined text-outline text-sm cursor-pointer hover:text-primary" data-icon="visibility">visibility</span>
+</div>
+</div>
+</div>
+</div>
+<!-- Card 2 -->
+<div class="vault-card group bg-surface-container-low/40 rounded-2xl p-5 flex flex-col relative">
+<div class="flex justify-between items-start mb-4">
+<div class="w-10 h-10 rounded-lg bg-tertiary-container/10 flex items-center justify-center border border-tertiary-container/20">
+<span class="material-symbols-outlined text-tertiary-container text-xl" data-icon="currency_bitcoin">currency_bitcoin</span>
+</div>
+<div class="flex flex-col items-end gap-2">
+<span class="px-2 py-0.5 rounded-full text-[8px] bg-primary/10 text-primary border border-primary/20 font-bold uppercase tracking-widest">Encrypted</span>
+<span class="px-2 py-0.5 rounded text-[10px] bg-tertiary-container/10 text-tertiary-container border border-tertiary-container/20 font-bold uppercase tracking-wider">Crypto</span>
+</div>
+</div>
+<div class="mb-4">
+<div class="flex items-center gap-2 mb-1">
+<span class="material-symbols-outlined text-outline text-sm" data-icon="key">key</span>
+<h3 class="font-headline font-bold text-base text-on-surface truncate">Ledger Recovery Key</h3>
+</div>
+<p class="text-on-surface-variant text-xs font-body truncate">Offline Storage Phrase</p>
+</div>
+<div class="mt-auto pt-4 border-t border-white/5 flex flex-col gap-2">
+<div class="flex justify-between items-center">
+<p class="text-[10px] text-outline uppercase font-bold">Identity</p>
+<p class="font-mono text-xs text-on-surface">Vault-7712</p>
+</div>
+<div class="flex justify-between items-center">
+<div class="flex items-center gap-2">
+<button class="text-outline hover:text-primary transition-colors"><span class="material-symbols-outlined text-lg" data-icon="content_copy">content_copy</span></button>
+<button class="text-outline hover:text-secondary transition-colors"><span class="material-symbols-outlined text-lg" data-icon="more_vert">more_vert</span></button>
+</div>
+<span class="text-tertiary-container text-[10px] font-bold flex items-center gap-1 uppercase">
+<span class="material-symbols-outlined text-xs" data-icon="verified_user">verified_user</span> 2FA
+                        </span>
+</div>
+</div>
+</div>
+<!-- Card 3 -->
+<div class="vault-card group bg-surface-container-low/40 rounded-2xl p-5 flex flex-col relative">
+<div class="flex justify-between items-start mb-4">
+<div class="w-10 h-10 rounded-lg bg-secondary/10 flex items-center justify-center border border-secondary/20">
+<span class="material-symbols-outlined text-secondary text-xl" data-icon="mail">mail</span>
+</div>
+<div class="flex flex-col items-end gap-2">
+<span class="px-2 py-0.5 rounded-full text-[8px] bg-primary/10 text-primary border border-primary/20 font-bold uppercase tracking-widest">Encrypted</span>
+<span class="px-2 py-0.5 rounded text-[10px] bg-primary/10 text-primary border border-primary/20 font-bold uppercase tracking-wider">Personal</span>
+</div>
+</div>
+<div class="mb-4">
+<div class="flex items-center gap-2 mb-1">
+<span class="material-symbols-outlined text-outline text-sm" data-icon="credit_card">credit_card</span>
+<h3 class="font-headline font-bold text-base text-on-surface truncate">ProtonMail Admin</h3>
+</div>
+<p class="text-on-surface-variant text-xs font-body truncate">mail.proton.me</p>
+</div>
+<div class="mt-auto pt-4 border-t border-white/5 flex flex-col gap-2">
+<div class="flex justify-between items-center">
+<p class="text-[10px] text-outline uppercase font-bold">Email</p>
+<p class="font-mono text-xs text-on-surface">nexus@pm.me</p>
+</div>
+<div class="flex justify-between items-center">
+<div class="flex items-center gap-2">
+<button class="text-outline hover:text-primary transition-colors"><span class="material-symbols-outlined text-lg" data-icon="content_copy">content_copy</span></button>
+</div>
+<div class="flex gap-0.5">
+<div class="w-3 h-1 rounded bg-primary"></div>
+<div class="w-3 h-1 rounded bg-primary"></div>
+<div class="w-3 h-1 rounded bg-primary"></div>
+<div class="w-3 h-1 rounded bg-primary/20"></div>
+</div>
+</div>
+</div>
+</div>
+<!-- Card 4 -->
+<div class="vault-card group bg-surface-container-low/40 rounded-2xl p-5 flex flex-col relative">
+<div class="flex justify-between items-start mb-4">
+<div class="w-10 h-10 rounded-lg bg-outline/10 flex items-center justify-center border border-outline/20">
+<span class="material-symbols-outlined text-outline text-xl" data-icon="database">database</span>
+</div>
+<div class="flex flex-col items-end gap-2">
+<span class="px-2 py-0.5 rounded-full text-[8px] bg-primary/10 text-primary border border-primary/20 font-bold uppercase tracking-widest">Encrypted</span>
+<span class="px-2 py-0.5 rounded text-[10px] bg-secondary/10 text-secondary border border-secondary/20 font-bold uppercase tracking-wider">Work</span>
+</div>
+</div>
+<div class="mb-4">
+<div class="flex items-center gap-2 mb-1">
+<span class="material-symbols-outlined text-outline text-sm" data-icon="description">description</span>
+<h3 class="font-headline font-bold text-base text-on-surface truncate">Production DB Key</h3>
+</div>
+<p class="text-on-surface-variant text-xs font-body truncate">PostgreSQL / Nexus-Cluster-01</p>
+</div>
+<div class="mt-auto pt-4 border-t border-white/5 flex flex-col gap-2">
+<div class="flex justify-between items-center">
+<p class="text-[10px] text-outline uppercase font-bold">User</p>
+<p class="font-mono text-xs text-on-surface">db_admin_svc</p>
+</div>
+<div class="flex justify-between items-center">
+<div class="flex items-center gap-2">
+<button class="text-outline hover:text-primary transition-colors"><span class="material-symbols-outlined text-lg" data-icon="content_copy">content_copy</span></button>
+<button class="text-outline hover:text-secondary transition-colors"><span class="material-symbols-outlined text-lg" data-icon="refresh">refresh</span></button>
+</div>
+<p class="font-mono text-[10px] text-error font-bold italic">14d Exp.</p>
+</div>
+</div>
+</div>
+<!-- Card 5 (Duplicated for grid fill) -->
+<div class="vault-card group bg-surface-container-low/40 rounded-2xl p-5 flex flex-col relative">
+<div class="flex justify-between items-start mb-4">
+<div class="w-10 h-10 rounded-lg bg-primary/10 flex items-center justify-center border border-primary/20">
+<span class="material-symbols-outlined text-primary text-xl" data-icon="shield">shield</span>
+</div>
+<div class="flex flex-col items-end gap-2">
+<span class="px-2 py-0.5 rounded-full text-[8px] bg-primary/10 text-primary border border-primary/20 font-bold uppercase tracking-widest">Encrypted</span>
+<span class="px-2 py-0.5 rounded text-[10px] bg-primary/10 text-primary border border-primary/20 font-bold uppercase tracking-wider">Personal</span>
+</div>
+</div>
+<div class="mb-4">
+<div class="flex items-center gap-2 mb-1">
+<span class="material-symbols-outlined text-outline text-sm" data-icon="key">key</span>
+<h3 class="font-headline font-bold text-base text-on-surface truncate">Main GitHub SSH</h3>
+</div>
+<p class="text-on-surface-variant text-xs font-body truncate">github.com/nexus-core</p>
+</div>
+<div class="mt-auto pt-4 border-t border-white/5 flex flex-col gap-2">
+<div class="flex justify-between items-center">
+<p class="text-[10px] text-outline uppercase font-bold">Identity</p>
+<p class="font-mono text-xs text-on-surface">ed25519-node-01</p>
+</div>
+<div class="flex justify-between items-center">
+<div class="flex items-center gap-2">
+<button class="text-outline hover:text-primary transition-colors"><span class="material-symbols-outlined text-lg" data-icon="content_copy">content_copy</span></button>
+</div>
+<span class="text-primary text-[10px] font-bold flex items-center gap-1 uppercase">
+<span class="material-symbols-outlined text-xs" data-icon="verified">verified</span> SECURE
+                        </span>
+</div>
+</div>
+</div>
+<!-- Card 6 (Duplicated for grid fill) -->
+<div class="vault-card group bg-surface-container-low/40 rounded-2xl p-5 flex flex-col relative">
+<div class="flex justify-between items-start mb-4">
+<div class="w-10 h-10 rounded-lg bg-secondary/10 flex items-center justify-center border border-secondary/20">
+<span class="material-symbols-outlined text-secondary text-xl" data-icon="credit_card">credit_card</span>
+</div>
+<div class="flex flex-col items-end gap-2">
+<span class="px-2 py-0.5 rounded-full text-[8px] bg-primary/10 text-primary border border-primary/20 font-bold uppercase tracking-widest">Encrypted</span>
+<span class="px-2 py-0.5 rounded text-[10px] bg-secondary/10 text-secondary border border-secondary/20 font-bold uppercase tracking-wider">Work</span>
+</div>
+</div>
+<div class="mb-4">
+<div class="flex items-center gap-2 mb-1">
+<span class="material-symbols-outlined text-outline text-sm" data-icon="lock">lock</span>
+<h3 class="font-headline font-bold text-base text-on-surface truncate">Stripe Production</h3>
+</div>
+<p class="text-on-surface-variant text-xs font-body truncate">dashboard.stripe.com</p>
+</div>
+<div class="mt-auto pt-4 border-t border-white/5 flex flex-col gap-2">
+<div class="flex justify-between items-center">
+<p class="text-[10px] text-outline uppercase font-bold">Token</p>
+<p class="font-mono text-xs text-on-surface">sk_prod_...9a2e</p>
+</div>
+<div class="flex justify-between items-center">
+<div class="flex items-center gap-2">
+<button class="text-outline hover:text-primary transition-colors"><span class="material-symbols-outlined text-lg" data-icon="content_copy">content_copy</span></button>
+</div>
+<div class="flex items-center gap-1">
+<span class="text-on-surface tracking-widest text-[10px]">• • • • • •</span>
+<span class="material-symbols-outlined text-outline text-sm cursor-pointer hover:text-primary" data-icon="visibility">visibility</span>
+</div>
+</div>
+</div>
+</div>
+</div>
+<!-- Summary Stats (Bento style at bottom) -->
+<div class="mt-12 grid grid-cols-1 md:grid-cols-3 gap-6">
+<div class="bg-surface-container-low/60 rounded-3xl p-6 border border-white/5 relative overflow-hidden group">
+<div class="absolute -right-4 -top-4 w-24 h-24 bg-primary/5 rounded-full blur-2xl group-hover:bg-primary/10 transition-colors"></div>
+<p class="text-outline text-xs uppercase font-bold tracking-widest mb-4">Network Activity</p>
+<div class="flex items-end gap-1 h-12 mb-4">
+<div class="w-2 bg-primary/40 h-[40%] rounded-t-sm"></div>
+<div class="w-2 bg-primary/60 h-[70%] rounded-t-sm"></div>
+<div class="w-2 bg-primary h-[50%] rounded-t-sm"></div>
+<div class="w-2 bg-primary/80 h-[90%] rounded-t-sm"></div>
+<div class="w-2 bg-primary h-[30%] rounded-t-sm"></div>
+<div class="w-2 bg-primary/60 h-[60%] rounded-t-sm"></div>
+</div>
+<p class="text-2xl font-headline font-bold text-on-surface">Secure Sync</p>
+<p class="text-outline text-sm">Last update: 2m ago</p>
+</div>
+<div class="bg-surface-container-low/60 rounded-3xl p-6 border border-white/5 relative overflow-hidden group">
+<div class="absolute -right-4 -top-4 w-24 h-24 bg-secondary/5 rounded-full blur-2xl group-hover:bg-secondary/10 transition-colors"></div>
+<p class="text-outline text-xs uppercase font-bold tracking-widest mb-4">Threat Detection</p>
+<div class="flex items-center gap-4 mb-4">
+<span class="material-symbols-outlined text-secondary text-4xl" data-icon="verified">verified</span>
+<span class="text-3xl font-headline font-bold text-on-surface">Clean</span>
+</div>
+<p class="text-on-surface-variant text-sm">0 Intrusions detected in 30 days.</p>
+</div>
+<div class="bg-surface-container-low/60 rounded-3xl p-6 border border-white/5 relative overflow-hidden group">
+<div class="absolute -right-4 -top-4 w-24 h-24 bg-tertiary-container/5 rounded-full blur-2xl group-hover:bg-tertiary-container/10 transition-colors"></div>
+<p class="text-outline text-xs uppercase font-bold tracking-widest mb-4">Global Nodes</p>
+<div class="flex items-center gap-4 mb-4">
+<span class="material-symbols-outlined text-tertiary-container text-4xl" data-icon="public">public</span>
+<span class="text-3xl font-headline font-bold text-on-surface">12/12</span>
+</div>
+<p class="text-on-surface-variant text-sm">Active clusters in Tokyo, London, NYC.</p>
+</div>
+</div>
+</main>
+</div>
+<!-- Floating Action Button -->
+<button class="fixed bottom-8 right-8 w-16 h-16 rounded-full bg-gradient-to-br from-[#6ff1e7] to-[#17b3aa] text-[#002826] shadow-[0_10px_40px_rgba(111,241,231,0.4)] flex items-center justify-center group hover:scale-110 active:scale-95 transition-all z-50 border border-white/20">
+<span class="material-symbols-outlined text-3xl transition-transform duration-300 group-hover:rotate-90" data-icon="add">add</span>
+</button>
+<!-- Mobile Navigation (BottomNavBar) -->
+<div class="md:hidden fixed bottom-0 left-0 w-full bg-[#0b0e18]/90 backdrop-blur-xl border-t border-white/5 px-6 py-4 flex justify-between items-center z-50">
+<button class="flex flex-col items-center gap-1 text-[#7EFFF5]">
+<span class="material-symbols-outlined" data-icon="enhanced_encryption">enhanced_encryption</span>
+<span class="text-[10px] font-bold uppercase tracking-widest">Vaults</span>
+</button>
+<button class="flex flex-col items-center gap-1 text-outline">
+<span class="material-symbols-outlined" data-icon="terminal">terminal</span>
+<span class="text-[10px] font-bold uppercase tracking-widest">Log</span>
+</button>
+<button class="flex flex-col items-center gap-1 text-outline">
+<span class="material-symbols-outlined" data-icon="shield_lock">shield_lock</span>
+<span class="text-[10px] font-bold uppercase tracking-widest">Tools</span>
+</button>
+<button class="flex flex-col items-center gap-1 text-outline">
+<span class="material-symbols-outlined" data-icon="settings_suggest">settings_suggest</span>
+<span class="text-[10px] font-bold uppercase tracking-widest">Prefs</span>
+</button>
+</div>
+</body></html>

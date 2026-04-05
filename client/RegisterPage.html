@@ -1,0 +1,272 @@
+<!DOCTYPE html>
+
+<html class="dark" lang="en"><head>
+<meta charset="utf-8"/>
+<meta content="width=device-width, initial-scale=1.0" name="viewport"/>
+<title>SecureVault | Create Your Identity</title>
+<script src="https://cdn.tailwindcss.com?plugins=forms,container-queries"></script>
+<link href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@300;400;500;600;700&amp;family=Manrope:wght@300;400;500;600;700&amp;family=JetBrains+Mono:wght@400;500&amp;family=Syne:wght@400;500;600;700;800&amp;display=swap" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet"/>
+<script id="tailwind-config">
+        tailwind.config = {
+            darkMode: "class",
+            theme: {
+                extend: {
+                    colors: {
+                        "surface-container-lowest": "#000000",
+                        "outline": "#737582",
+                        "primary-dim": "#5fe3d9",
+                        "on-tertiary-container": "#445f00",
+                        "on-secondary": "#45002a",
+                        "secondary-fixed-dim": "#ffabcf",
+                        "on-secondary-container": "#fff5f7",
+                        "inverse-on-surface": "#525461",
+                        "primary": "#6ff1e7",
+                        "on-background": "#ecedfc",
+                        "on-primary-container": "#002826",
+                        "on-tertiary": "#4a6800",
+                        "error-dim": "#d7383b",
+                        "secondary": "#ff66b5",
+                        "secondary-container": "#b60076",
+                        "tertiary-fixed": "#c6fd55",
+                        "primary-container": "#17b3aa",
+                        "on-tertiary-fixed": "#354b00",
+                        "tertiary-container": "#c6fd55",
+                        "on-error": "#490006",
+                        "tertiary-dim": "#b9ee48",
+                        "surface-container-low": "#10131e",
+                        "on-surface": "#ecedfc",
+                        "outline-variant": "#454753",
+                        "inverse-surface": "#faf8ff",
+                        "background": "#0b0e18",
+                        "surface": "#0b0e18",
+                        "primary-fixed": "#6ff1e7",
+                        "surface-dim": "#0b0e18",
+                        "on-tertiary-fixed-variant": "#4c6a00",
+                        "on-error-container": "#ffa8a3",
+                        "error": "#ff716c",
+                        "on-secondary-fixed-variant": "#9d0065",
+                        "on-primary": "#005854",
+                        "on-secondary-fixed": "#6a0043",
+                        "surface-container-high": "#1b1f2c",
+                        "surface-container": "#161925",
+                        "secondary-dim": "#ff66b5",
+                        "surface-container-highest": "#212534",
+                        "on-primary-fixed-variant": "#00635e",
+                        "primary-fixed-dim": "#5fe3d9",
+                        "on-surface-variant": "#a9aab8",
+                        "tertiary-fixed-dim": "#b9ee48",
+                        "tertiary": "#f2ffd1",
+                        "surface-bright": "#272c3b",
+                        "inverse-primary": "#006b65",
+                        "error-container": "#9f0519",
+                        "surface-tint": "#6ff1e7",
+                        "surface-variant": "#212534",
+                        "secondary-fixed": "#ffc0d9",
+                        "on-primary-fixed": "#004440"
+                    },
+                    fontFamily: {
+                        "headline": ["Syne", "sans-serif"],
+                        "body": ["Manrope", "sans-serif"],
+                        "label": ["Space Grotesk", "sans-serif"],
+                        "mono": ["JetBrains Mono", "monospace"]
+                    },
+                    borderRadius: {"DEFAULT": "0.125rem", "lg": "0.25rem", "xl": "0.5rem", "full": "0.75rem"},
+                },
+            },
+        }
+    </script>
+<style>
+        body {
+            background-color: #0b0e18;
+            background-image: 
+                radial-gradient(circle at 10% 20%, rgba(111, 241, 231, 0.08) 0%, transparent 40%),
+                radial-gradient(circle at 90% 80%, rgba(255, 102, 181, 0.08) 0%, transparent 40%);
+            overflow-x: hidden;
+        }
+        .aurora-blur {
+            position: fixed;
+            width: 100vw;
+            height: 100vh;
+            top: 0;
+            left: 0;
+            z-index: -1;
+            overflow: hidden;
+        }
+        .particle {
+            position: absolute;
+            width: 2px;
+            height: 2px;
+            background: #6ff1e7;
+            border-radius: 50%;
+            opacity: 0.3;
+        }
+        .glass-card {
+            backdrop-filter: blur(24px);
+            background: rgba(16, 19, 30, 0.6);
+            border: 1px solid rgba(255, 255, 255, 0.05);
+        }
+        .material-symbols-outlined {
+            font-variation-settings: 'FILL' 0, 'wght' 400, 'GRAD' 0, 'opsz' 24;
+        }
+    </style>
+</head>
+<body class="font-body text-on-surface">
+<!-- Background Elements -->
+<div class="aurora-blur">
+<div class="particle" style="top: 15%; left: 20%;"></div>
+<div class="particle" style="top: 45%; left: 85%;"></div>
+<div class="particle" style="top: 75%; left: 10%;"></div>
+<div class="particle" style="top: 25%; left: 60%;"></div>
+<div class="particle" style="top: 85%; left: 40%;"></div>
+</div>
+<!-- Top Navigation Bar (Shared Component Strategy) -->
+<nav class="fixed top-0 z-50 w-full bg-[#0b0e18]/80 backdrop-blur-lg border-b border-white/5 px-8 py-4 flex justify-between items-center shadow-[0_8px_32px_0_rgba(0,0,0,0.37)]">
+<div class="flex items-center gap-2">
+<span class="material-symbols-outlined text-[#7EFFF5] text-3xl" data-icon="lock">lock</span>
+<span class="font-headline text-2xl font-black bg-gradient-to-br from-[#6ff1e7] to-[#17b3aa] bg-clip-text text-transparent tracking-tight">SecureVault</span>
+</div>
+<div class="hidden md:flex gap-8">
+<a class="text-slate-400 font-medium hover:text-[#7EFFF5] transition-all duration-300" href="#">Features</a>
+<a class="text-slate-400 font-medium hover:text-[#7EFFF5] transition-all duration-300" href="#">Security</a>
+<a class="text-[#7EFFF5] border-b-2 border-[#7EFFF5] pb-1" href="#">Sign Up</a>
+</div>
+<div class="flex items-center gap-4">
+<span class="material-symbols-outlined text-slate-400 cursor-pointer" data-icon="settings">settings</span>
+</div>
+</nav>
+<!-- Main Content Canvas -->
+<main class="min-h-screen flex items-center justify-center px-4 pt-24 pb-12">
+<div class="max-w-4xl w-full grid md:grid-cols-5 gap-0 glass-card rounded-xl overflow-hidden shadow-[0_20px_40px_rgba(0,0,0,0.4),0_0_15px_rgba(126,255,245,0.05)]">
+<!-- Sidebar Progress (Asymmetric layout hint) -->
+<div class="md:col-span-2 bg-surface-container-low p-10 border-r border-white/5 flex flex-col justify-between">
+<div>
+<h1 class="font-headline text-4xl font-extrabold text-on-surface leading-tight mb-4">Initialize Your<br/>Safe Passage.</h1>
+<p class="text-on-surface-variant text-sm leading-relaxed mb-12">Establish your unique cryptographic signature across the SecureVault network. Your privacy is our prime directive.</p>
+<!-- Stepper -->
+<div class="space-y-8">
+<div class="flex items-center gap-4 group">
+<div class="w-10 h-10 rounded-full border-2 border-primary flex items-center justify-center bg-primary/10 text-primary font-bold">1</div>
+<div class="flex flex-col">
+<span class="text-sm font-bold text-primary tracking-wider uppercase">Identity</span>
+<span class="text-xs text-on-surface-variant">Core Account Setup</span>
+</div>
+</div>
+<div class="flex items-center gap-4 opacity-40">
+<div class="w-10 h-10 rounded-full border-2 border-outline-variant flex items-center justify-center text-outline-variant font-bold">2</div>
+<div class="flex flex-col">
+<span class="text-sm font-bold tracking-wider uppercase">V-Auth</span>
+<span class="text-xs">Security Verification</span>
+</div>
+</div>
+<div class="flex items-center gap-4 opacity-40">
+<div class="w-10 h-10 rounded-full border-2 border-outline-variant flex items-center justify-center text-outline-variant font-bold">3</div>
+<div class="flex flex-col">
+<span class="text-sm font-bold tracking-wider uppercase">Vaults</span>
+<span class="text-xs">Initial Configuration</span>
+</div>
+</div>
+</div>
+</div>
+<div class="mt-auto pt-12">
+<div class="p-4 bg-surface-container-lowest rounded-lg border border-white/5">
+<p class="text-[10px] font-mono text-outline uppercase tracking-[0.2em] mb-2">Encryption Status</p>
+<div class="flex items-center gap-2">
+<div class="h-1.5 w-1.5 rounded-full bg-tertiary-container"></div>
+<span class="text-xs font-mono text-tertiary-container">AES-256 ACTIVE</span>
+</div>
+</div>
+</div>
+</div>
+<!-- Registration Form Area -->
+<div class="md:col-span-3 p-10 md:p-14">
+<div class="mb-10">
+<h2 class="font-headline text-2xl font-bold mb-2">Account Setup</h2>
+<p class="text-on-surface-variant text-sm">Step 1 of 3: Define your access credentials.</p>
+</div>
+<form class="space-y-6">
+<!-- Email Field -->
+<div class="space-y-2">
+<label class="text-[11px] font-mono uppercase tracking-widest text-outline ml-1">Universal Identifier (Email)</label>
+<div class="relative">
+<input class="w-full bg-surface-container-lowest border-none rounded-lg py-4 pl-12 pr-4 text-on-surface font-mono text-sm ring-1 ring-white/10 focus:ring-2 focus:ring-primary/50 transition-all outline-none" placeholder="nexus@securevault.io" type="email"/>
+<span class="material-symbols-outlined absolute left-4 top-1/2 -translate-y-1/2 text-outline text-xl" data-icon="alternate_email">alternate_email</span>
+</div>
+</div>
+<!-- Password Field -->
+<div class="space-y-2">
+<label class="text-[11px] font-mono uppercase tracking-widest text-outline ml-1">Access Fragment (Password)</label>
+<div class="relative">
+<input class="w-full bg-surface-container-lowest border-none rounded-lg py-4 pl-12 pr-4 text-on-surface font-mono text-sm ring-1 ring-white/10 focus:ring-2 focus:ring-primary/50 transition-all outline-none" placeholder="••••••••••••" type="password"/>
+<span class="material-symbols-outlined absolute left-4 top-1/2 -translate-y-1/2 text-outline text-xl" data-icon="lock_open">lock_open</span>
+<span class="material-symbols-outlined absolute right-4 top-1/2 -translate-y-1/2 text-outline cursor-pointer hover:text-primary transition-colors" data-icon="visibility">visibility</span>
+</div>
+<!-- Password Strength Meter -->
+<div class="pt-3 px-1">
+<div class="flex justify-between items-center mb-2">
+<span class="text-[10px] font-bold uppercase tracking-tighter text-tertiary-container">Quantum Resistant Strength</span>
+<span class="text-[10px] font-mono text-on-surface-variant">85% Secure</span>
+</div>
+<div class="flex gap-1.5 h-1">
+<div class="flex-1 bg-tertiary-container rounded-full"></div>
+<div class="flex-1 bg-tertiary-container rounded-full"></div>
+<div class="flex-1 bg-tertiary-container rounded-full"></div>
+<div class="flex-1 bg-tertiary-container/20 rounded-full"></div>
+</div>
+<ul class="mt-4 grid grid-cols-2 gap-y-2">
+<li class="flex items-center gap-2">
+<span class="material-symbols-outlined text-[14px] text-tertiary-container" data-icon="check_circle" data-weight="fill" style="font-variation-settings: 'FILL' 1;">check_circle</span>
+<span class="text-[11px] text-on-surface-variant">12+ Characters</span>
+</li>
+<li class="flex items-center gap-2">
+<span class="material-symbols-outlined text-[14px] text-tertiary-container" data-icon="check_circle" data-weight="fill" style="font-variation-settings: 'FILL' 1;">check_circle</span>
+<span class="text-[11px] text-on-surface-variant">Mixed Symbology</span>
+</li>
+<li class="flex items-center gap-2 opacity-50">
+<span class="material-symbols-outlined text-[14px] text-outline" data-icon="circle" style="font-variation-settings: 'wght' 200;">circle</span>
+<span class="text-[11px] text-on-surface-variant">Non-Sequential</span>
+</li>
+<li class="flex items-center gap-2 opacity-50">
+<span class="material-symbols-outlined text-[14px] text-outline" data-icon="circle" style="font-variation-settings: 'wght' 200;">circle</span>
+<span class="text-[11px] text-on-surface-variant">Biometric Sync</span>
+</li>
+</ul>
+</div>
+</div>
+<!-- CTA Section -->
+<div class="pt-8 flex flex-col gap-4">
+<button class="w-full bg-gradient-to-r from-primary to-primary-container text-on-primary-container font-headline font-extrabold py-4 px-6 rounded-lg uppercase tracking-wider text-sm shadow-lg shadow-primary/10 hover:opacity-90 active:scale-[0.98] transition-all" type="button">
+                            Initialize Protocol
+                        </button>
+<p class="text-center text-xs text-on-surface-variant">
+                            Already authenticated? <a class="text-primary font-bold hover:underline" href="#">Access Terminal</a>
+</p>
+</div>
+</form>
+<!-- Floating Info Card (Asymmetric detail) -->
+<div class="mt-12 p-5 bg-surface-container-high/40 rounded-xl border border-white/5 flex items-start gap-4">
+<div class="p-2 rounded-lg bg-primary/5">
+<span class="material-symbols-outlined text-primary" data-icon="security_update_good">security_update_good</span>
+</div>
+<div>
+<h4 class="text-xs font-bold text-on-surface mb-1 uppercase tracking-tight">Zero-Knowledge Proof</h4>
+<p class="text-[11px] text-on-surface-variant leading-relaxed">SecureVault never stores your raw password. We use salted hashing and client-side encryption, meaning even we can't see your data.</p>
+</div>
+</div>
+</div>
+</div>
+</main>
+<!-- Footer Meta -->
+<footer class="fixed bottom-6 left-1/2 -translate-x-1/2 flex items-center gap-8 text-[10px] font-mono text-outline uppercase tracking-[0.2em] opacity-60">
+<div class="flex items-center gap-2">
+<span class="w-2 h-2 rounded-full bg-primary animate-pulse"></span>
+            Node: US-EAST-01
+        </div>
+<div>System Version: 4.8.2-OMEGA</div>
+<div class="flex gap-4">
+<a class="hover:text-primary transition-colors" href="#">Privacy</a>
+<a class="hover:text-primary transition-colors" href="#">Terms</a>
+</div>
+</footer>
+</body></html>

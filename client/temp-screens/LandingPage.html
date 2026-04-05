@@ -1,0 +1,336 @@
+<!DOCTYPE html>
+
+<html class="dark" lang="en"><head>
+<meta charset="utf-8"/>
+<meta content="width=device-width, initial-scale=1.0" name="viewport"/>
+<title>SecureVault | The Celestial Observer</title>
+<script src="https://cdn.tailwindcss.com?plugins=forms,container-queries"></script>
+<link href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@300;400;500;600;700&amp;family=Manrope:wght@300;400;500;600;700&amp;family=JetBrains+Mono:wght@400;500&amp;family=Syne:wght@400;500;600;700;800&amp;display=swap" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet"/>
+<script id="tailwind-config">
+        tailwind.config = {
+            darkMode: "class",
+            theme: {
+                extend: {
+                    colors: {
+                        "surface-container-lowest": "#000000",
+                        "outline": "#737582",
+                        "primary-dim": "#5fe3d9",
+                        "on-tertiary-container": "#445f00",
+                        "on-secondary": "#45002a",
+                        "secondary-fixed-dim": "#ffabcf",
+                        "on-secondary-container": "#fff5f7",
+                        "inverse-on-surface": "#525461",
+                        "primary": "#6ff1e7",
+                        "on-background": "#ecedfc",
+                        "on-primary-container": "#002826",
+                        "on-tertiary": "#4a6800",
+                        "error-dim": "#d7383b",
+                        "secondary": "#ff66b5",
+                        "secondary-container": "#b60076",
+                        "tertiary-fixed": "#c6fd55",
+                        "primary-container": "#17b3aa",
+                        "on-tertiary-fixed": "#354b00",
+                        "tertiary-container": "#c6fd55",
+                        "on-error": "#490006",
+                        "tertiary-dim": "#b9ee48",
+                        "surface-container-low": "#10131e",
+                        "on-surface": "#ecedfc",
+                        "outline-variant": "#454753",
+                        "inverse-surface": "#faf8ff",
+                        "background": "#0b0e18",
+                        "surface": "#0b0e18",
+                        "primary-fixed": "#6ff1e7",
+                        "surface-dim": "#0b0e18",
+                        "on-tertiary-fixed-variant": "#4c6a00",
+                        "on-error-container": "#ffa8a3",
+                        "error": "#ff716c",
+                        "on-secondary-fixed-variant": "#9d0065",
+                        "on-primary": "#005854",
+                        "on-secondary-fixed": "#6a0043",
+                        "surface-container-high": "#1b1f2c",
+                        "surface-container": "#161925",
+                        "secondary-dim": "#ff66b5",
+                        "surface-container-highest": "#212534",
+                        "on-primary-fixed-variant": "#00635e",
+                        "primary-fixed-dim": "#5fe3d9",
+                        "on-surface-variant": "#a9aab8",
+                        "tertiary-fixed-dim": "#b9ee48",
+                        "tertiary": "#f2ffd1",
+                        "surface-bright": "#272c3b",
+                        "inverse-primary": "#006b65",
+                        "error-container": "#9f0519",
+                        "surface-tint": "#6ff1e7",
+                        "surface-variant": "#212534",
+                        "secondary-fixed": "#ffc0d9",
+                        "on-primary-fixed": "#004440"
+                    },
+                    fontFamily: {
+                        "headline": ["Syne", "sans-serif"],
+                        "body": ["Manrope", "sans-serif"],
+                        "label": ["Space Grotesk", "sans-serif"],
+                        "mono": ["JetBrains Mono", "monospace"]
+                    },
+                    borderRadius: { "DEFAULT": "0.125rem", "lg": "0.25rem", "xl": "0.5rem", "full": "0.75rem" },
+                },
+            },
+        }
+    </script>
+<style>
+        .material-symbols-outlined {
+            font-variation-settings: 'FILL' 0, 'wght' 400, 'GRAD' 0, 'opsz' 24;
+        }
+        .glass-card {
+            background: rgba(27, 31, 44, 0.4);
+            backdrop-filter: blur(20px);
+            -webkit-backdrop-filter: blur(20px);
+        }
+        .aurora-bg {
+            background: radial-gradient(circle at 20% 30%, rgba(111, 241, 231, 0.08) 0%, transparent 40%),
+                        radial-gradient(circle at 80% 70%, rgba(255, 102, 181, 0.08) 0%, transparent 40%);
+        }
+        .floating-icon {
+            filter: drop-shadow(0 0 15px rgba(111, 241, 231, 0.3));
+        }
+    </style>
+</head>
+<body class="bg-background text-on-background font-body selection:bg-primary/30 selection:text-primary">
+<!-- TopAppBar Navigation Shell -->
+<header class="bg-[#0b0e18]/80 backdrop-blur-lg docked full-width top-0 z-50 border-b border-white/5 shadow-[0_8px_32px_0_rgba(0,0,0,0.37)] flex justify-between items-center px-8 py-4 w-full">
+<div class="flex items-center gap-3">
+<span class="material-symbols-outlined text-[#7EFFF5] text-2xl" data-icon="lock">lock</span>
+<span class="font-['Space_Grotesk'] text-2xl font-black bg-gradient-to-br from-[#6ff1e7] to-[#17b3aa] bg-clip-text text-transparent">SecureVault</span>
+</div>
+<nav class="hidden md:flex items-center gap-8 font-['Space_Grotesk'] font-bold tracking-tight">
+<a class="text-[#7EFFF5] border-b-2 border-[#7EFFF5] pb-1 hover:text-[#7EFFF5] transition-all duration-300" href="#">Vaults</a>
+<a class="text-slate-400 font-medium hover:text-[#7EFFF5] transition-all duration-300" href="#">Features</a>
+<a class="text-slate-400 font-medium hover:text-[#7EFFF5] transition-all duration-300" href="#">Compliance</a>
+<a class="text-slate-400 font-medium hover:text-[#7EFFF5] transition-all duration-300" href="#">Enterprise</a>
+</nav>
+<div class="flex items-center gap-6">
+<div class="hidden lg:flex items-center bg-surface-container-lowest rounded-full px-4 py-1.5 border border-white/5">
+<span class="material-symbols-outlined text-outline text-sm mr-2" data-icon="search">search</span>
+<span class="text-xs text-outline font-label uppercase tracking-widest">Search encrypted indexes</span>
+</div>
+<div class="flex items-center gap-4">
+<span class="material-symbols-outlined text-slate-400 cursor-pointer hover:text-[#7EFFF5] transition-all duration-300" data-icon="notifications">notifications</span>
+<span class="material-symbols-outlined text-slate-400 cursor-pointer hover:text-[#7EFFF5] transition-all duration-300" data-icon="settings">settings</span>
+<div class="w-10 h-10 rounded-full border border-primary/20 p-0.5">
+<img alt="User Avatar" class="w-full h-full rounded-full object-cover" data-alt="Close up portrait of a professional man with neutral expression in low key high contrast lighting" src="https://lh3.googleusercontent.com/aida-public/AB6AXuCt2taxt9afonvk39GQL0sS1FtGtMc4aoiWmCiDbHNE5WP4uSPDHHtuGluLkBFqm1IcrAY81uUY5ynGnyUQZGEKP4DfhuTnK4yAhc8OUxqVccrvnXF4HkWlRhFV6j11CuzfF3v2dDfYckoK0QKBuTCVtrWSgk5zByF1b5elQp5Omf7Usws5DmSH-1RawckFYHd29sbtMcKqqQnY-wtS0Tl6D3cF8-4YTD7ai-q6lSuGZDIdRemU9lzMqwiqHK02nx_2dDo_VvVWtSc"/>
+</div>
+</div>
+</div>
+</header>
+<main class="relative min-h-screen overflow-hidden aurora-bg">
+<!-- Floating Particle Dots (Decorative) -->
+<div class="absolute inset-0 pointer-events-none opacity-20">
+<div class="absolute top-1/4 left-1/4 w-1 h-1 bg-primary rounded-full"></div>
+<div class="absolute top-3/4 left-1/3 w-1 h-1 bg-secondary rounded-full"></div>
+<div class="absolute top-1/2 left-2/3 w-1.5 h-1.5 bg-primary rounded-full"></div>
+<div class="absolute top-1/4 left-3/4 w-1 h-1 bg-secondary rounded-full"></div>
+<div class="absolute bottom-1/4 right-1/4 w-1 h-1 bg-primary rounded-full"></div>
+</div>
+<!-- Hero Section -->
+<section class="relative z-10 pt-32 pb-20 px-8 container mx-auto">
+<div class="grid lg:grid-cols-2 gap-16 items-center">
+<div class="space-y-8">
+<div class="inline-flex items-center gap-2 px-3 py-1 rounded-full bg-primary/5 border border-primary/10">
+<span class="w-2 h-2 rounded-full bg-primary shadow-[0_0_8px_#6ff1e7]"></span>
+<span class="text-[10px] font-label font-bold text-primary uppercase tracking-[0.2em]">Quantum-Ready Encryption v2.4</span>
+</div>
+<h1 class="font-headline text-6xl md:text-8xl font-extrabold tracking-tighter leading-[0.9] text-on-surface">
+                        THE CELESTIAL <br/>
+<span class="bg-gradient-to-br from-primary to-primary-container bg-clip-text text-transparent">OBSERVER.</span>
+</h1>
+<p class="text-on-surface-variant text-lg md:text-xl max-w-xl font-body leading-relaxed">
+                        Navigate the encrypted cosmos. SecureVault provides a high-fidelity environment for your most sensitive data, utilizing <span class="text-on-surface font-semibold">Zero-Knowledge architecture</span> and sovereign self-hosting.
+                    </p>
+<div class="flex flex-wrap gap-4 pt-4">
+<button class="px-8 py-4 bg-gradient-to-br from-primary to-primary-container text-on-primary-fixed font-label font-bold uppercase tracking-wider rounded-md shadow-[0_10px_25px_-5px_rgba(111,241,231,0.4)] hover:opacity-90 transition-all active:scale-95">
+                            Initialize Vault
+                        </button>
+<button class="px-8 py-4 bg-transparent border border-white/10 text-on-surface font-label font-bold uppercase tracking-wider rounded-md hover:bg-white/5 transition-all">
+                            View Whitepaper
+                        </button>
+</div>
+</div>
+<div class="relative flex justify-center items-center">
+<div class="absolute w-[500px] h-[500px] bg-primary/5 rounded-full blur-[100px]"></div>
+<div class="relative glass-card p-12 rounded-[2rem] border border-white/10 shadow-[20px_0_40px_rgba(0,0,0,0.4)] group overflow-hidden">
+<div class="absolute inset-0 bg-gradient-to-br from-primary/10 to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-700"></div>
+<div class="relative z-10 flex flex-col items-center">
+<span class="material-symbols-outlined text-[120px] text-primary floating-icon" data-icon="lock_open" data-weight="fill">lock_open</span>
+<div class="mt-8 text-center">
+<span class="font-mono text-xs text-primary/60 block mb-2">ENCRYPTING FRAGMENT: 0x8F2...A92</span>
+<div class="w-48 h-1.5 bg-surface-container-lowest rounded-full overflow-hidden border border-white/5">
+<div class="w-2/3 h-full bg-gradient-to-r from-primary to-primary-container rounded-full shadow-[0_0_10px_#6ff1e7]"></div>
+</div>
+</div>
+</div>
+</div>
+<!-- Small Floating Elements -->
+<div class="absolute -top-10 -right-4 glass-card p-4 rounded-xl border border-white/10 transform rotate-12 shadow-2xl">
+<span class="material-symbols-outlined text-secondary" data-icon="terminal">terminal</span>
+</div>
+<div class="absolute -bottom-8 -left-8 glass-card p-6 rounded-xl border border-white/10 transform -rotate-6 shadow-2xl">
+<span class="material-symbols-outlined text-primary" data-icon="shield_lock">shield_lock</span>
+</div>
+</div>
+</div>
+</section>
+<!-- Feature Cards Section (Asymmetric Grid) -->
+<section class="container mx-auto px-8 py-20">
+<div class="grid md:grid-cols-12 gap-6">
+<!-- Zero-Knowledge Card -->
+<div class="md:col-span-7 group">
+<div class="h-full glass-card p-10 rounded-2xl border border-white/5 hover:border-primary/40 transition-all duration-500 shadow-2xl relative overflow-hidden">
+<div class="absolute top-0 right-0 p-8 opacity-10 group-hover:opacity-20 transition-opacity">
+<span class="material-symbols-outlined text-[140px]" data-icon="vpn_key">vpn_key</span>
+</div>
+<div class="relative z-10">
+<div class="w-12 h-12 flex items-center justify-center rounded-lg bg-primary/10 text-primary mb-6">
+<span class="material-symbols-outlined" data-icon="visibility_off">visibility_off</span>
+</div>
+<h3 class="font-headline text-3xl font-bold mb-4 tracking-tight">Zero-Knowledge Architecture</h3>
+<p class="text-on-surface-variant font-body leading-relaxed max-w-md">
+                                Your encryption keys never leave your device. Even we cannot see what's inside your vault. Data is fractured and distributed across celestial nodes.
+                            </p>
+<div class="mt-10 font-mono text-sm text-primary flex items-center gap-2">
+<span class="w-2 h-2 rounded-full bg-primary animate-pulse"></span>
+                                PROTOCOL: AES-GCM-256-V2
+                            </div>
+</div>
+</div>
+</div>
+<!-- Self-Hosted Card -->
+<div class="md:col-span-5 group">
+<div class="h-full glass-card p-10 rounded-2xl border border-white/5 hover:border-secondary/40 transition-all duration-500 shadow-2xl bg-gradient-to-b from-surface-container-high/40 to-transparent">
+<div class="w-12 h-12 flex items-center justify-center rounded-lg bg-secondary/10 text-secondary mb-6">
+<span class="material-symbols-outlined" data-icon="dns">dns</span>
+</div>
+<h3 class="font-headline text-3xl font-bold mb-4 tracking-tight">Self-Hosted Sovereignity</h3>
+<p class="text-on-surface-variant font-body leading-relaxed">
+                            Deploy your private node on any infrastructure. Full Docker and Kubernetes support for high-availability security.
+                        </p>
+<div class="mt-12 flex -space-x-3">
+<div class="w-8 h-8 rounded-full bg-surface-container-highest border border-white/10 flex items-center justify-center"><span class="material-symbols-outlined text-[14px]" data-icon="cloud">cloud</span></div>
+<div class="w-8 h-8 rounded-full bg-surface-container-highest border border-white/10 flex items-center justify-center"><span class="material-symbols-outlined text-[14px]" data-icon="database">database</span></div>
+<div class="w-8 h-8 rounded-full bg-surface-container-highest border border-white/10 flex items-center justify-center"><span class="material-symbols-outlined text-[14px]" data-icon="router">router</span></div>
+</div>
+</div>
+</div>
+<!-- Audit Logs / Terminal Card -->
+<div class="md:col-span-12 group">
+<div class="glass-card p-8 rounded-2xl border border-white/5 shadow-2xl grid md:grid-cols-2 gap-8 items-center">
+<div class="bg-surface-container-lowest p-6 rounded-xl font-mono text-xs border border-white/5 max-h-48 overflow-hidden relative">
+<div class="flex items-center gap-2 mb-4 text-outline border-b border-white/5 pb-2">
+<span class="w-2.5 h-2.5 rounded-full bg-error/50"></span>
+<span class="w-2.5 h-2.5 rounded-full bg-tertiary-container/50"></span>
+<span class="w-2.5 h-2.5 rounded-full bg-primary/50"></span>
+<span class="ml-2 uppercase tracking-tighter opacity-50">SecureVault Shell v1.0.4</span>
+</div>
+<div class="space-y-1.5">
+<div class="flex gap-4"><span class="text-outline">12:04:22</span> <span class="text-primary">[SUCCESS]</span> Decrypting header...</div>
+<div class="flex gap-4"><span class="text-outline">12:04:23</span> <span class="text-primary">[SUCCESS]</span> Authentication handshake verified</div>
+<div class="flex gap-4"><span class="text-outline">12:04:25</span> <span class="text-secondary">[WARNING]</span> Shared link access from unknown IP: 192.168.1.1</div>
+<div class="flex gap-4"><span class="text-outline">12:04:28</span> <span class="text-primary">[SUCCESS]</span> Vault session locked</div>
+<div class="flex gap-4"><span class="text-outline">12:05:01</span> <span class="text-outline-variant">&gt; Listening for incoming sync...</span></div>
+</div>
+<div class="absolute inset-x-0 bottom-0 h-12 bg-gradient-to-t from-surface-container-lowest to-transparent"></div>
+</div>
+<div>
+<h3 class="font-headline text-3xl font-bold mb-4 tracking-tight">Immutable Audit Logs</h3>
+<p class="text-on-surface-variant font-body leading-relaxed mb-6">
+                                Every action is cryptographically signed and recorded. No deletions, no alterations—only pure, untampered transparency for compliance.
+                            </p>
+<a class="inline-flex items-center gap-2 text-primary font-label font-bold uppercase tracking-widest text-sm hover:gap-4 transition-all" href="#">
+                                Explore Tools <span class="material-symbols-outlined text-sm" data-icon="arrow_forward">arrow_forward</span>
+</a>
+</div>
+</div>
+</div>
+</div>
+</section>
+<!-- CTAs / Social Proof -->
+<section class="container mx-auto px-8 py-32 text-center relative overflow-hidden">
+<div class="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-[800px] h-[400px] bg-secondary/5 rounded-full blur-[120px] pointer-events-none"></div>
+<div class="relative z-10 max-w-3xl mx-auto">
+<h2 class="font-headline text-5xl font-bold mb-8 leading-tight">Ready to transcend standard security?</h2>
+<div class="flex flex-col sm:flex-row justify-center gap-6">
+<button class="px-10 py-5 bg-gradient-to-br from-primary to-primary-container text-on-primary-fixed font-label font-bold uppercase tracking-widest rounded-md shadow-2xl hover:scale-105 transition-transform active:scale-95">
+                        Create Personal Vault
+                    </button>
+<button class="px-10 py-5 bg-tertiary-container text-on-tertiary-container font-label font-bold uppercase tracking-widest rounded-md hover:bg-tertiary-dim transition-colors">
+                        Enterprise Inquiry
+                    </button>
+</div>
+<div class="mt-16 flex justify-center items-center gap-12 opacity-40 grayscale hover:grayscale-0 transition-all">
+<span class="font-headline text-2xl font-bold tracking-widest">NEXUS</span>
+<span class="font-headline text-2xl font-bold tracking-widest">AETHER</span>
+<span class="font-headline text-2xl font-bold tracking-widest">QUANTUM</span>
+<span class="font-headline text-2xl font-bold tracking-widest">VOID</span>
+</div>
+</div>
+</section>
+</main>
+<footer class="bg-surface-container-low border-t border-white/5 py-16 px-8 relative z-20">
+<div class="container mx-auto grid grid-cols-2 md:grid-cols-4 lg:grid-cols-6 gap-12">
+<div class="col-span-2 space-y-6">
+<div class="flex items-center gap-2">
+<span class="material-symbols-outlined text-[#7EFFF5]" data-icon="lock">lock</span>
+<span class="font-['Space_Grotesk'] text-xl font-bold text-[#7EFFF5]">SecureVault</span>
+</div>
+<p class="text-on-surface-variant text-sm max-w-xs leading-relaxed">
+                    The ultimate destination for sovereign data protection and celestial-grade encryption infrastructure.
+                </p>
+<div class="flex gap-4">
+<div class="w-8 h-8 rounded-full border border-white/10 flex items-center justify-center text-outline hover:text-primary transition-colors cursor-pointer">
+<span class="material-symbols-outlined text-sm" data-icon="alternate_email">alternate_email</span>
+</div>
+<div class="w-8 h-8 rounded-full border border-white/10 flex items-center justify-center text-outline hover:text-primary transition-colors cursor-pointer">
+<span class="material-symbols-outlined text-sm" data-icon="terminal">terminal</span>
+</div>
+</div>
+</div>
+<div class="space-y-4">
+<h4 class="font-label font-bold text-xs uppercase tracking-[0.2em] text-on-surface">Vaults</h4>
+<ul class="space-y-2 text-sm text-on-surface-variant">
+<li class="hover:text-primary transition-colors cursor-pointer">Personal</li>
+<li class="hover:text-primary transition-colors cursor-pointer">Teams</li>
+<li class="hover:text-primary transition-colors cursor-pointer">Enterprise</li>
+<li class="hover:text-primary transition-colors cursor-pointer">Shadow Nodes</li>
+</ul>
+</div>
+<div class="space-y-4">
+<h4 class="font-label font-bold text-xs uppercase tracking-[0.2em] text-on-surface">Resources</h4>
+<ul class="space-y-2 text-sm text-on-surface-variant">
+<li class="hover:text-primary transition-colors cursor-pointer">API Docs</li>
+<li class="hover:text-primary transition-colors cursor-pointer">Security Audits</li>
+<li class="hover:text-primary transition-colors cursor-pointer">Status</li>
+<li class="hover:text-primary transition-colors cursor-pointer">GitHub</li>
+</ul>
+</div>
+<div class="space-y-4">
+<h4 class="font-label font-bold text-xs uppercase tracking-[0.2em] text-on-surface">Legal</h4>
+<ul class="space-y-2 text-sm text-on-surface-variant">
+<li class="hover:text-primary transition-colors cursor-pointer">Privacy</li>
+<li class="hover:text-primary transition-colors cursor-pointer">Sovereignty</li>
+<li class="hover:text-primary transition-colors cursor-pointer">Terms</li>
+<li class="hover:text-primary transition-colors cursor-pointer">Compliance</li>
+</ul>
+</div>
+<div class="space-y-4">
+<h4 class="font-label font-bold text-xs uppercase tracking-[0.2em] text-on-surface">Newsletter</h4>
+<div class="flex flex-col gap-2">
+<input class="bg-surface-container-lowest border border-white/5 rounded-md text-xs px-4 py-2 focus:ring-1 focus:ring-primary outline-none" placeholder="orbital@nexus.com" type="email"/>
+<button class="bg-primary-container/20 text-primary font-label text-[10px] font-bold uppercase py-2 rounded-md hover:bg-primary-container/30 transition-all">Connect</button>
+</div>
+</div>
+</div>
+<div class="container mx-auto mt-20 pt-8 border-t border-white/5 flex flex-col md:flex-row justify-between items-center gap-4 text-[10px] font-mono text-outline">
+<span>© 2024 SECUREVAULT PROTOCOL. ALL RIGHTS RESERVED.</span>
+<span>01010011 01000101 01000011 01010101 01010010 01000101</span>
+</div>
+</footer>
+</body></html>

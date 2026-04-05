@@ -1,4 +1,4 @@
-import AuroraBackground from '../components/background/Aurorabackground';
+import AuroraBackground from '../components/background/AuroraBackground';
 import GlassCard from '../components/ui/GlassCard';
 import Button from '../components/ui/Button';
 import Input from '../components/ui/Input';

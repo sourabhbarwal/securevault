@@ -1,86 +1,23 @@
-import { motion } from 'framer-motion';
-import { Link, useNavigate, useLocation } from 'react-router-dom';
-import { Lock, Vault, Settings, LogOut, Key } from 'lucide-react';
-import toast from 'react-hot-toast';
-import { useAuth } from '../../context/AuthContext';
-
-const NAV_ITEMS = [
-  { path: '/vault',    label: 'Vault',    icon: Vault },
-  { path: '/settings', label: 'Settings', icon: Settings },
-];
+import React from 'react';
+import { Link } from 'react-router-dom';
 
 export default function Navbar() {
-  const { user, logout } = useAuth();
-  const navigate = useNavigate();
-  const location = useLocation();
-
-  const handleLogout = async () => {
-    await logout();
-    toast.success('Logged out securely');
-    navigate('/login');
-  };
-
   return (
-    <motion.nav
-      initial={{ opacity: 0, y: -20 }}
-      animate={{ opacity: 1, y: 0 }}
-      transition={{ duration: 0.5 }}
-      style={{
-        position: 'fixed', top: 0, left: 0, right: 0, zIndex: 100,
-        display: 'flex', alignItems: 'center', justifyContent: 'space-between',
-        padding: '16px 40px',
-        background: 'rgba(4,6,15,0.75)',
-        backdropFilter: 'blur(20px)',
-        WebkitBackdropFilter: 'blur(20px)',
-        borderBottom: '1px solid var(--border)',
-      }}
-    >
-      {/* Logo */}
-      <Link to="/vault" style={{ display: 'flex', alignItems: 'center', gap: 10, textDecoration: 'none' }}>
-        <div className="glow-cyan" style={{ width: 36, height: 36, borderRadius: 10, background: 'linear-gradient(135deg, #7EFFF5, #FF3CAC)', display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
-          <Lock size={18} color="#04060F" strokeWidth={2.5} />
-        </div>
-        <span style={{ fontFamily: 'var(--font-display)', fontSize: 18, fontWeight: 800, color: 'var(--text-primary)' }}>
+    <nav className="fixed top-0 z-50 w-full bg-[#0b0e18]/80 backdrop-blur-lg border-b border-white/5 px-8 py-4 flex justify-between items-center shadow-[0_8px_32px_0_rgba(0,0,0,0.37)]">
+      <div className="flex items-center gap-2">
+        <span className="material-symbols-outlined text-[#7EFFF5] text-3xl" data-icon="lock">lock</span>
+        <span className="font-headline text-2xl font-black bg-gradient-to-br from-[#6ff1e7] to-[#17b3aa] bg-clip-text text-transparent tracking-tight">
           SecureVault
         </span>
-      </Link>
-
-      {/* Nav links */}
-      <div style={{ display: 'flex', gap: 4 }}>
-        {NAV_ITEMS.map(item => {
-          const active = location.pathname === item.path;
-          return (
-            <Link key={item.path} to={item.path} style={{
-              display: 'flex', alignItems: 'center', gap: 7,
-              padding: '8px 16px', borderRadius: 'var(--radius-md)',
-              textDecoration: 'none', fontSize: 14, fontWeight: active ? 600 : 400,
-              color: active ? 'var(--primary)' : 'var(--text-secondary)',
-              background: active ? 'var(--primary-dim)' : 'transparent',
-              border: `1px solid ${active ? 'var(--primary-border)' : 'transparent'}`,
-              transition: 'all var(--dur-normal)',
-            }}>
-              <item.icon size={15} />
-              {item.label}
-            </Link>
-          );
-        })}
       </div>
-
-      {/* User + logout */}
-      <div style={{ display: 'flex', alignItems: 'center', gap: 12 }}>
-        {user && (
-          <span style={{ fontSize: 13, color: 'var(--text-muted)', fontFamily: 'var(--font-mono)' }}>
-            {user.email.split('@')[0]}
-          </span>
-        )}
-        <button
-          onClick={handleLogout}
-          style={{ display: 'flex', alignItems: 'center', gap: 6, padding: '8px 14px', borderRadius: 'var(--radius-md)', background: 'var(--accent-dim)', border: '1px solid var(--accent-border)', color: 'var(--accent)', cursor: 'pointer', fontSize: 13, fontFamily: 'var(--font-body)', fontWeight: 600 }}
-        >
-          <LogOut size={14} />
-          Logout
-        </button>
+      <div className="hidden md:flex gap-8">
+        <Link className="text-slate-400 font-medium hover:text-[#7EFFF5] transition-all duration-300" to="/">Features</Link>
+        <Link className="text-slate-400 font-medium hover:text-[#7EFFF5] transition-all duration-300" to="/">Security</Link>
+        <Link className="text-[#7EFFF5] border-b-2 border-[#7EFFF5] pb-1" to="/register">Sign Up</Link>
       </div>
-    </motion.nav>
+      <div className="flex items-center gap-4">
+        <span className="material-symbols-outlined text-slate-400 cursor-pointer" data-icon="settings">settings</span>
+      </div>
+    </nav>
   );
 }
