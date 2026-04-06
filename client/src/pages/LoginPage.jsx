@@ -1,6 +1,50 @@
 import React from 'react';
+import { useState } from 'react';
+import { useNavigate, Link } from 'react-router-dom';
+import toast from 'react-hot-toast';
+import { useAuth } from '../context/AuthContext';
 
 export default function LoginPage() {
+const navigate   = useNavigate();
+const { login }  = useAuth();
+
+const [email,    setEmail]    = useState('');
+const [password, setPassword] = useState('');
+const [loading,  setLoading]  = useState(false);
+const [errors,   setErrors]   = useState({});
+
+const validate = () => {
+  const e = {};
+  if (!email)    e.email    = 'Email is required';
+  else if (!/\S+@\S+\.\S+/.test(email)) e.email = 'Invalid email';
+  if (!password) e.password = 'Password is required';
+  setErrors(e);
+  return Object.keys(e).length === 0;
+};
+
+const handleSubmit = async (e) => {
+  if (e?.preventDefault) e.preventDefault();
+  if (!validate()) return;
+
+  setLoading(true);
+  try {
+    const result = await login(email, password);
+
+    if (result?.requires2FA) {
+      navigate('/verify-2fa', {
+        state: { userId: result.userId, password },
+      });
+      return;
+    }
+
+    toast.success('Welcome back!');
+    navigate('/vault');
+  } catch (err) {
+    toast.error(err.response?.data?.message || 'Login failed. Check your credentials.');
+  } finally {
+    setLoading(false);
+  }
+};
   return (
     <div className="bg-background text-on-background font-body selection:bg-primary/30 min-h-screen overflow-hidden relative">
       {/* Atmospheric Layers */}
@@ -30,13 +74,18 @@ export default function LoginPage() {
             </h1>
             <p className="text-on-surface-variant font-medium text-sm">IDENTIFICATION REQUIRED FOR QUANTUM DECRYPTION</p>
           </div>
-          <form className="space-y-6">
+          <form className="space-y-6" onSubmit={handleSubmit}>
             {/* Email Field */}
             <div className="space-y-2">
               <label className="block text-xs font-headline font-bold uppercase tracking-widest text-outline ml-1">Terminal ID (Email)</label>
               <div className="relative">
                 <span className="absolute left-4 top-1/2 -translate-y-1/2 material-symbols-outlined text-outline group-focus-within:text-primary transition-colors" data-icon="alternate_email">alternate_email</span>
-                <input className="w-full bg-surface-container-lowest border-none py-4 pl-12 pr-4 rounded-lg font-mono text-sm text-primary placeholder:text-outline/40 focus:ring-2 focus:ring-primary/30 transition-all outline-none" placeholder="observer@nexus.security" type="email" />
+                <input className="w-full bg-surface-container-lowest border-none py-4 pl-12 pr-4 rounded-lg font-mono text-sm text-primary placeholder:text-outline/40 focus:ring-2 focus:ring-primary/30 transition-all outline-none" placeholder="observer@nexus.security" type="email" value={email} onChange={(e)=>setEmail(e.target.value)} error={errors.email}/>
+                {errors.email && (
+                  <p style={{ color: '#FF3CAC', fontSize: '12px', marginTop: '4px', fontFamily: 'monospace' }}>
+                    {errors.email}
+                  </p>
+                )}
               </div>
             </div>
             {/* Password Field */}
@@ -44,7 +93,12 @@ export default function LoginPage() {
               <label className="block text-xs font-headline font-bold uppercase tracking-widest text-outline ml-1">Security Cipher</label>
               <div className="relative">
                 <span className="absolute left-4 top-1/2 -translate-y-1/2 material-symbols-outlined text-outline group-focus-within:text-primary transition-colors" data-icon="key_visualizer">key_visualizer</span>
-                <input className="w-full bg-surface-container-lowest border-none py-4 pl-12 pr-4 rounded-lg font-mono text-sm text-primary placeholder:text-outline/40 focus:ring-2 focus:ring-primary/30 transition-all outline-none" placeholder="••••••••••••" type="password" />
+                <input className="w-full bg-surface-container-lowest border-none py-4 pl-12 pr-4 rounded-lg font-mono text-sm text-primary placeholder:text-outline/40 focus:ring-2 focus:ring-primary/30 transition-all outline-none" placeholder="••••••••••••" type="password" value={password} onChange={(e)=>setPassword(e.target.value)} error={errors.password}/>
+                {errors.password && (
+                  <p style={{ color: '#FF3CAC', fontSize: '12px', marginTop: '4px', fontFamily: 'monospace' }}>
+                    {errors.password}
+                  </p>
+                )}
               </div>
             </div>
             <div className="flex items-center justify-between py-2">
@@ -58,8 +112,8 @@ export default function LoginPage() {
               <a className="text-xs font-bold text-outline hover:text-primary transition-colors" href="#">Forgotten Key?</a>
             </div>
             {/* Login Button */}
-            <button className="w-full py-4 rounded-lg bg-gradient-to-r from-primary to-primary-container text-on-primary-container font-headline font-black text-sm uppercase tracking-widest shadow-[0_10px_20px_-5px_rgba(23,179,170,0.4)] hover:shadow-[0_15px_30px_-5px_rgba(23,179,170,0.6)] hover:scale-[1.01] active:scale-[0.98] transition-all duration-300" type="button">
-              Initiate Connection
+            <button className="w-full py-4 rounded-lg bg-gradient-to-r from-primary to-primary-container text-on-primary-container font-headline font-black text-sm uppercase tracking-widest shadow-[0_10px_20px_-5px_rgba(23,179,170,0.4)] hover:shadow-[0_15px_30px_-5px_rgba(23,179,170,0.6)] hover:scale-[1.01] active:scale-[0.98] transition-all duration-300" type="submit" disabled={loading} onClick={handleSubmit} style={{ opacity: loading ? 0.6 : 1, cursor: loading ? 'not-allowed' : 'pointer' }}>
+              {loading ? 'Signing in...' : 'Sign In'}
             </button>
           </form>
           <div className="mt-10 pt-8 border-t border-outline-variant/10 text-center">
