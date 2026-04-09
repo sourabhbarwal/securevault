@@ -8,6 +8,7 @@ import RegisterPage   from './pages/RegisterPage';
 // import TwoFactorPage  from './pages/TwoFactorPage';   // we create this in Phase 15
 import VaultDashboard from './pages/VaultDashboard';  // the name your agent used
 import SettingsPage   from './pages/SettingsPage';
+import TwoFactorPage from './pages/TwoFactorPage';
 
 // ── Route guards ──────────────────────────────────────────
 function Protected({ children }) {
@@ -34,7 +35,7 @@ export default function App() {
       <Route path="/home"       element={<LandingPage />} />
       <Route path="/login"      element={<Public><LoginPage /></Public>} />
       <Route path="/register"   element={<Public><RegisterPage /></Public>} />
-      {/* <Route path="/verify-2fa" element={<TwoFactorPage />} /> */}
+      <Route path="/verify-2fa" element={<TwoFactorPage />} />
 
       {/* Protected routes */}
       <Route path="/vault"    element={<Protected><VaultDashboard /></Protected>} />
