@@ -1,5 +1,6 @@
 import React from 'react';
 import { useState, useEffect, useCallback } from 'react';
+import { useNavigate }                        from 'react-router-dom';
 import { motion, AnimatePresence }           from 'framer-motion';
 import toast                                 from 'react-hot-toast';
 import { useAuth }                           from '../context/AuthContext';
@@ -9,6 +10,7 @@ import { encryptSecret, decryptSecret }      from '../utils/encryption';
 export default function VaultDashboard() {
       // ── Auth + State ──────────────────────────────────────────
     const { aesKey, logout } = useAuth();
+    const navigate = useNavigate();
 
     const [secrets,  setSecrets]  = useState([]);
     const [loading,  setLoading]  = useState(true);
@@ -155,23 +157,23 @@ export default function VaultDashboard() {
         </div>
         <div className="hidden md:flex items-center gap-8">
           <nav className="flex items-center gap-6">
-            <a className="text-[#7EFFF5] border-b-2 border-[#7EFFF5] pb-1 font-['Space_Grotesk'] font-bold tracking-tight transition-all duration-300" href="#">Vaults</a>
+            <a className="text-[#7EFFF5] border-b-2 border-[#7EFFF5] pb-1 font-['Space_Grotesk'] font-bold tracking-tight transition-all duration-300" href="/vault">Vaults</a>
             <a className="text-slate-400 font-medium font-['Space_Grotesk'] hover:text-[#7EFFF5] transition-all duration-300" href="#">Audit Log</a>
-            <a className="text-slate-400 font-medium font-['Space_Grotesk'] hover:text-[#7EFFF5] transition-all duration-300" href="#">Tools</a>
           </nav>
           <div className="h-8 w-[1px] bg-white/10 mx-2"></div>
           <div className="flex items-center gap-4">
             <button className="text-slate-400 hover:text-[#7EFFF5] transition-all"><span className="material-symbols-outlined" data-icon="notifications">notifications</span></button>
-            <button className="text-slate-400 hover:text-[#7EFFF5] transition-all"><span className="material-symbols-outlined" data-icon="settings">settings</span></button>
+            <button onClick={() => navigate('/settings')} className="text-slate-400 hover:text-[#7EFFF5] transition-all"><span className="material-symbols-outlined" data-icon="settings">settings</span></button>
             <div className="w-10 h-10 rounded-full overflow-hidden border border-primary/20">
               <img alt="User Avatar" className="w-full h-full object-cover" src="https://lh3.googleusercontent.com/aida-public/AB6AXuAkFviRK1ADe_w1HnWY_oSSP-tMgjxfOPw9InvycQ8LlGj4ihlz_oMnte-ePq3XfoPvoRVOedIqJcEWzcFGUPn0EzgfJNkNFuCXvuxDOQvJ77ojXuXzGij6R3sQhHqZP6BGQhEBoM_GEol92b_PgX8yM6Id_dkWUMCge7yKTDoXy2AZ__j7d4GPVKyYw5WIdSmJbhsNiyUymoR8mjNSp7a17ZLctLA_j6GotiP2Fq7Ubonc9NlDAUi7lDrkF_DM-K8RnydtwGYnXIQ" />
             </div>
           </div>
         </div>
       </header>
+
       <div className="flex min-h-screen">
         {/* SideNavBar */}
-        <aside className="bg-[#0b0e18]/40 backdrop-blur-2xl fixed left-0 top-[72px] h-[calc(100vh-72px)] w-72 rounded-r-xl border-r border-white/5 shadow-[20px_0_40px_rgba(0,0,0,0.4)] z-40 hidden md:flex flex-col">
+        <aside className="bg-[#0b0e18]/40 backdrop-blur-2xl fixed left-0 top-[64px] h-[calc(100vh-72px)] w-72 rounded-r-xl border-r border-white/5 shadow-[20px_0_40px_rgba(0,0,0,0.4)] z-40 hidden md:flex flex-col">
           <div className="px-8 pt-8 pb-4">
             <h2 className="text-[#7EFFF5] text-xl font-bold font-['Space_Grotesk'] tracking-wide">The Observer</h2>
             <p className="text-slate-500 text-xs uppercase tracking-widest mt-1">Quantum-Encrypted</p>

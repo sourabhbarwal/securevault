@@ -135,9 +135,8 @@ export default function SettingsPage() {
         </div>
         <div className="hidden md:flex items-center gap-8">
           <nav className="flex gap-6">
-            <a className="text-slate-400 font-medium hover:text-[#7EFFF5] transition-all duration-300 font-['Space_Grotesk']" href="#">Vaults</a>
+            <a className="text-slate-400 font-medium hover:text-[#7EFFF5] transition-all duration-300 font-['Space_Grotesk']" href="/vault">Vaults</a>
             <a className="text-slate-400 font-medium hover:text-[#7EFFF5] transition-all duration-300 font-['Space_Grotesk']" href="#">Audit Log</a>
-            <a className="text-[#7EFFF5] border-b-2 border-[#7EFFF5] pb-1 font-bold font-['Space_Grotesk']" href="#">Preferences</a>
           </nav>
           <div className="flex items-center gap-4 border-l border-white/10 pl-8">
             <span className="material-symbols-outlined text-slate-400 cursor-pointer hover:text-[#7EFFF5] transition-colors">notifications</span>
@@ -145,39 +144,7 @@ export default function SettingsPage() {
             <div className="w-8 h-8 rounded-full overflow-hidden border border-primary/20">
               <img alt="User Avatar" className="w-full h-full object-cover" src="https://lh3.googleusercontent.com/aida-public/AB6AXuBG9_CFbdqUFSfosY0nAAQq8gDMIjwaBoYp-dhnxjtMHJvbffXiJDYwF7YW5vyxpiFFiedshON_FcWY9RCLL2fyWl7nZITbqwsiS8QCkd6_r0BZpdd6suDtomgU_U-SYxPtSHYENtpQFYoa-Sayw6aW9POu7chIXmTRS2clVNQvWporBi3n_48ThQLiAK2HP6nwq9mGQeTGWUSpnKlLAgVo5TWsJdwFG9nfK77VypZByJUqm8ZU67U5P9R0vfOgg6WWlPAL7bIg09Y" />
             </div>
-          </div>
-        </div>
-      </header>
-      <div className="flex">
-        {/* SideNavBar */}
-        <aside className="bg-[#0b0e18]/40 backdrop-blur-2xl border-r border-white/5 shadow-[20px_0_40px_rgba(0,0,0,0.4)] fixed left-0 top-[72px] h-[calc(100vh-72px)] w-72 rounded-r-xl z-40 hidden lg:flex flex-col gap-2 pt-8">
-          <div className="px-8 mb-8">
-            <h2 className="text-[#7EFFF5] text-xl font-bold font-['Space_Grotesk']">The Observer</h2>
-            <p className="text-slate-500 text-xs tracking-[0.2em] uppercase font-bold">Quantum-Encrypted</p>
-          </div>
-          <nav className="flex flex-col gap-1">
-            <a className="text-slate-500 px-6 py-3 hover:bg-white/5 hover:text-slate-200 transition-colors duration-200 flex items-center gap-4 font-['Space_Grotesk'] text-sm tracking-wide group" href="#">
-              <span className="material-symbols-outlined group-hover:translate-x-1 transition-transform duration-300">enhanced_encryption</span>
-              <span>Vaults</span>
-            </a>
-            <a className="text-slate-500 px-6 py-3 hover:bg-white/5 hover:text-slate-200 transition-colors duration-200 flex items-center gap-4 font-['Space_Grotesk'] text-sm tracking-wide group" href="#">
-              <span className="material-symbols-outlined group-hover:translate-x-1 transition-transform duration-300">terminal</span>
-              <span>Audit Log</span>
-            </a>
-            <a className="text-slate-500 px-6 py-3 hover:bg-white/5 hover:text-slate-200 transition-colors duration-200 flex items-center gap-4 font-['Space_Grotesk'] text-sm tracking-wide group" href="#">
-              <span className="material-symbols-outlined group-hover:translate-x-1 transition-transform duration-300">shield_lock</span>
-              <span>Security Tools</span>
-            </a>
-            <a className="text-slate-500 px-6 py-3 hover:bg-white/5 hover:text-slate-200 transition-colors duration-200 flex items-center gap-4 font-['Space_Grotesk'] text-sm tracking-wide group" href="#">
-              <span className="material-symbols-outlined group-hover:translate-x-1 transition-transform duration-300">group_work</span>
-              <span>Shared Items</span>
-            </a>
-            <a className="bg-gradient-to-r from-[#7EFFF5]/10 to-transparent text-[#7EFFF5] border-l-4 border-[#7EFFF5] px-6 py-3 font-bold flex items-center gap-4 font-['Space_Grotesk'] text-sm tracking-wide" href="#">
-              <span className="material-symbols-outlined" style={{ fontVariationSettings: "'FILL' 1" }}>settings_suggest</span>
-              <span>Preferences</span>
-            </a>
-          </nav>
-          <div className="mt-auto p-6">
+            <div className="mt-auto p-6">
             <button
               onClick={logout}
               className="w-full py-3 bg-secondary-container text-on-secondary-container font-black text-xs uppercase tracking-widest rounded-lg hover:opacity-90 active:scale-95 transition-all"
@@ -185,7 +152,10 @@ export default function SettingsPage() {
               Lock All Vaults
             </button>
           </div>
-        </aside>
+          </div>
+        </div>
+      </header>
+      <div className="flex">
         {/* Main Canvas */}
         <main className="flex-1 lg:ml-72 p-8 md:p-12 max-w-7xl">
           <header className="mb-12">
