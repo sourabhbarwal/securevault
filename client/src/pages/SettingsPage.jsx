@@ -1,15 +1,132 @@
 import React from 'react';
+import { useState, useEffect } from 'react';
+import toast                   from 'react-hot-toast';
+import { useAuth }             from '../context/AuthContext';
+import axios                   from '../api/axiosInstance';
 
 export default function SettingsPage() {
+  const { user, setUser, logout } = useAuth();
+
+  // ── State ─────────────────────────────────────────────────
+  const [apiKeys,    setApiKeys]    = useState([]);
+  const [auditLogs,  setAuditLogs]  = useState([]);
+  const [qrCode,     setQrCode]     = useState(null);
+  const [manualKey,  setManualKey]  = useState('');
+  const [totpCode,   setTotpCode]   = useState('');
+  const [newKeyName, setNewKeyName] = useState('');
+  const [loading,    setLoading]    = useState({});
+
+  const setLoad = (key, val) => setLoading((p) => ({ ...p, [key]: val }));
+
+  // ── Load API keys + audit log on mount ────────────────────
+  useEffect(() => {
+    axios.get('/apikeys')
+      .then((r) => setApiKeys(r.data.data.apiKeys || []))
+      .catch(() => toast.error('Failed to load API keys'));
+
+    axios.get('/audit?limit=15')
+      .then((r) => setAuditLogs(r.data.data.logs || []))
+      .catch(() => toast.error('Failed to load audit log'));
+  }, []);
+
+  // ── 2FA: Get QR code ──────────────────────────────────────
+  const handle2FASetup = async () => {
+    setLoad('setup', true);
+    try {
+      const { data } = await axios.post('/auth/2fa/setup');
+      setQrCode(data.data.qrCode);
+      setManualKey(data.data.manualKey);
+      toast('Scan the QR code with Google Authenticator then enter the code below');
+    } catch (err) {
+      toast.error(err.response?.data?.message || '2FA setup failed');
+    } finally {
+      setLoad('setup', false);
+    }
+  };
+
+  // ── 2FA: Confirm QR scanned and enable ────────────────────
+  const handle2FAEnable = async () => {
+    if (totpCode.length !== 6) {
+      toast.error('Enter the 6-digit code from Google Authenticator');
+      return;
+    }
+    setLoad('enable', true);
+    try {
+      await axios.post('/auth/2fa/enable', { totpToken: totpCode });
+      setUser((prev) => ({ ...prev, isTwoFactorEnabled: true }));
+      setQrCode(null);
+      setTotpCode('');
+      toast.success('2FA enabled! Required on next login.');
+    } catch (err) {
+      toast.error(err.response?.data?.message || 'Invalid code — try again');
+    } finally {
+      setLoad('enable', false);
+    }
+  };
+
+  // ── 2FA: Disable ──────────────────────────────────────────
+  const handle2FADisable = async () => {
+    const code = window.prompt(
+      'To disable 2FA, enter your current 6-digit Google Authenticator code:'
+    );
+    if (!code) return;
+
+    setLoad('disable', true);
+    try {
+      await axios.post('/auth/2fa/disable', { totpToken: code.trim() });
+      setUser((prev) => ({ ...prev, isTwoFactorEnabled: false }));
+      toast.success('2FA disabled.');
+    } catch (err) {
+      toast.error(err.response?.data?.message || 'Incorrect code');
+    } finally {
+      setLoad('disable', false);
+    }
+  };
+
+  // ── API Key: Create ───────────────────────────────────────
+  const handleCreateKey = async () => {
+    if (!newKeyName.trim()) {
+      toast.error('Enter a name for the key first');
+      return;
+    }
+    setLoad('createKey', true);
+    try {
+      const { data } = await axios.post('/apikeys', {
+        name:        newKeyName.trim(),
+        permissions: ['read'],
+      });
+      const { rawKey, ...keyMeta } = data.data.apiKey;
+      try {
+        await navigator.clipboard.writeText(rawKey);
+        toast.success(`Key created and copied!\nPrefix: ${rawKey.substring(0, 20)}...`, { duration: 7000 });
+      } catch {
+        window.alert(`Your API Key (copy this now — shown only once):\n\n${rawKey}`);
+      }
+      setApiKeys((prev) => [...prev, keyMeta]);
+      setNewKeyName('');
+    } catch (err) {
+      toast.error(err.response?.data?.message || 'Failed to create key');
+    } finally {
+      setLoad('createKey', false);
+    }
+  };
+
+  // ── API Key: Revoke ───────────────────────────────────────
+  const handleRevokeKey = async (id, name) => {
+    if (!window.confirm(`Revoke "${name}"?\nAny app using this key will immediately lose access.`)) return;
+    try {
+      await axios.delete(`/apikeys/${id}`);
+      setApiKeys((prev) => prev.filter((k) => k._id !== id));
+      toast.success('Key revoked');
+    } catch {
+      toast.error('Failed to revoke key');
+    }
+  };
+
   return (
     <div className="font-body selection:bg-primary/30 min-h-screen">
-      <div className="aurora-blur">
-        <div className="particle" style={{ top: '15%', left: '25%' }}></div>
-        <div className="particle" style={{ top: '45%', left: '85%' }}></div>
-        <div className="particle" style={{ top: '75%', left: '15%' }}></div>
-        <div className="particle" style={{ top: '25%', left: '65%' }}></div>
-        <div className="particle" style={{ top: '85%', left: '45%' }}></div>
-      </div>
+      <div className="aurora-bg"></div>
+      <div className="fixed inset-0 particle-dots pointer-events-none z-0"></div>
       {/* TopAppBar */}
       <header className="bg-[#0b0e18]/80 backdrop-blur-lg border-b border-white/5 shadow-[0_8px_32px_0_rgba(0,0,0,0.37)] docked full-width top-0 z-50 flex justify-between items-center px-8 py-4 w-full sticky">
         <div className="flex items-center gap-3">
@@ -61,7 +178,10 @@ export default function SettingsPage() {
             </a>
           </nav>
           <div className="mt-auto p-6">
-            <button className="w-full py-3 bg-secondary-container text-on-secondary-container font-black text-xs uppercase tracking-widest rounded-lg hover:opacity-90 active:scale-95 transition-all">
+            <button
+              onClick={logout}
+              className="w-full py-3 bg-secondary-container text-on-secondary-container font-black text-xs uppercase tracking-widest rounded-lg hover:opacity-90 active:scale-95 transition-all"
+            >
               Lock All Vaults
             </button>
           </div>
@@ -69,7 +189,7 @@ export default function SettingsPage() {
         {/* Main Canvas */}
         <main className="flex-1 lg:ml-72 p-8 md:p-12 max-w-7xl">
           <header className="mb-12">
-            <h1 className="text-5xl font-black font-headline tracking-tighter mb-4">Security Preferences</h1>
+            <h1 className="text-5xl font-black font-headline tracking-tighter mb-4 text-on-surface">Security Preferences</h1>
             <p className="text-on-surface-variant max-w-2xl leading-relaxed">Configure your quantum-level defense parameters. All changes are propagated through the neural encrypted mesh instantly.</p>
           </header>
           {/* Bento Grid Layout */}
@@ -79,104 +199,228 @@ export default function SettingsPage() {
               <div>
                 <div className="flex items-center gap-3 mb-6">
                   <span className="material-symbols-outlined text-tertiary-fixed text-3xl">vibration</span>
-                  <h3 className="font-headline font-bold text-xl uppercase tracking-wider">Multi-Factor</h3>
+                  <h3 className="font-headline font-bold text-xl uppercase tracking-wider text-on-surface">Multi-Factor</h3>
                 </div>
                 <p className="text-on-surface-variant text-sm mb-8">Hardware-backed authentication using biometric keys and TOTP synchronization.</p>
               </div>
-              <div className="space-y-4">
-                <div className="flex items-center justify-between p-4 bg-surface-container-lowest rounded-lg border border-white/5">
-                  <span className="text-sm font-medium">Authenticator App</span>
-                  <div className="w-12 h-6 bg-tertiary-container rounded-full relative flex items-center px-1 shadow-[0_0_10px_rgba(198,253,85,0.3)]">
-                    <div className="w-4 h-4 bg-on-tertiary-container rounded-full ml-auto"></div>
+              <div className="space-y-4 mt-2">
+
+                {/* ── 2FA not enabled, no QR yet ── */}
+                {!user?.isTwoFactorEnabled && !qrCode && (
+                  <div className="p-4 bg-surface-container-lowest rounded-lg border border-white/5 flex items-center justify-between">
+                    <div>
+                      <p className="text-sm font-medium text-on-surface">Authenticator App (TOTP)</p>
+                      <p className="text-xs text-outline mt-0.5">Not enabled</p>
+                    </div>
+                    <button
+                      onClick={handle2FASetup}
+                      disabled={loading.setup}
+                      className="px-4 py-2 rounded-lg bg-primary/10 text-primary border border-primary/20 text-xs font-bold uppercase tracking-wider hover:bg-primary/20 active:scale-95 transition-all disabled:opacity-50"
+                    >
+                      {loading.setup ? 'Setting up…' : 'Enable 2FA'}
+                    </button>
                   </div>
-                </div>
-                <div className="flex items-center justify-between p-4 bg-surface-container-lowest rounded-lg border border-white/5">
-                  <span className="text-sm font-medium">YubiKey Support</span>
-                  <div className="w-12 h-6 bg-surface-variant rounded-full relative flex items-center px-1">
-                    <div className="w-4 h-4 bg-outline rounded-full"></div>
+                )}
+
+                {/* ── QR code step ── */}
+                {qrCode && (
+                  <div className="p-4 bg-surface-container-lowest rounded-lg border border-primary/20 flex flex-col gap-4">
+                    <p className="text-xs text-on-surface-variant">Scan with Google Authenticator:</p>
+                    <img
+                      src={qrCode}
+                      alt="2FA QR Code"
+                      className="rounded-xl border border-white/10"
+                      style={{ width: 180, height: 180 }}
+                    />
+                    {manualKey && (
+                      <p className="text-xs text-outline">
+                        Can't scan? Enter manually:&nbsp;
+                        <code className="text-primary break-all">{manualKey}</code>
+                      </p>
+                    )}
+                    <input
+                      value={totpCode}
+                      onChange={(e) => setTotpCode(e.target.value.replace(/\D/g, '').slice(0, 6))}
+                      placeholder="6-digit code"
+                      maxLength={6}
+                      inputMode="numeric"
+                      className="w-full text-center tracking-[0.25em] text-xl font-mono bg-surface-container p-3 rounded-lg border border-white/10 text-primary placeholder:text-outline focus:outline-none focus:border-primary/40"
+                    />
+                    <div className="flex gap-3">
+                      <button
+                        onClick={handle2FAEnable}
+                        disabled={loading.enable || totpCode.length !== 6}
+                        className="flex-1 py-2 rounded-lg bg-gradient-to-br from-primary to-primary-container text-on-primary font-bold text-xs uppercase tracking-wider hover:opacity-90 active:scale-95 transition-all disabled:opacity-40"
+                      >
+                        {loading.enable ? 'Enabling…' : 'Confirm & Enable'}
+                      </button>
+                      <button
+                        onClick={() => { setQrCode(null); setTotpCode(''); }}
+                        className="px-4 py-2 rounded-lg border border-white/10 text-outline text-xs hover:border-white/20 transition-all"
+                      >
+                        Cancel
+                      </button>
+                    </div>
                   </div>
+                )}
+
+                {/* ── 2FA is active ── */}
+                {user?.isTwoFactorEnabled && (
+                  <div className="p-4 bg-surface-container-lowest rounded-lg border border-tertiary-container/30 flex items-center justify-between">
+                    <div className="flex items-center gap-2">
+                      <span className="material-symbols-outlined text-tertiary-container text-lg" data-icon="verified_user">verified_user</span>
+                      <div>
+                        <p className="text-sm font-medium text-on-surface">2FA is active</p>
+                        <p className="text-xs text-tertiary-container mt-0.5">Required on every login</p>
+                      </div>
+                    </div>
+                    <button
+                      onClick={handle2FADisable}
+                      disabled={loading.disable}
+                      className="px-4 py-2 rounded-lg bg-error/10 text-error border border-error/20 text-xs font-bold uppercase tracking-wider hover:bg-error/20 active:scale-95 transition-all disabled:opacity-50"
+                    >
+                      {loading.disable ? 'Disabling…' : 'Disable 2FA'}
+                    </button>
+                  </div>
+                )}
+
+                {/* Static YubiKey row (coming soon) */}
+                <div className="flex items-center justify-between p-4 bg-surface-container-lowest rounded-lg border border-white/5 opacity-50">
+                  <span className="text-sm font-medium text-on-surface">YubiKey Support</span>
+                  <span className="text-xs text-outline uppercase tracking-widest">Coming soon</span>
                 </div>
+
               </div>
             </section>
             {/* API Key Management */}
             <section className="md:col-span-8 glass-card p-8 rounded-xl overflow-hidden">
-              <div className="flex items-center justify-between mb-8">
-                <div className="flex items-center gap-3">
-                  <span className="material-symbols-outlined text-primary text-3xl">api</span>
-                  <h3 className="font-headline font-bold text-xl uppercase tracking-wider">Neural API Nodes</h3>
-                </div>
-                <button className="bg-gradient-to-br from-primary to-primary-container text-on-primary-fixed font-black text-xs uppercase px-6 py-2 rounded-md hover:shadow-[0_0_15px_rgba(111,241,231,0.4)] transition-all">
-                  Generate Node
+              {/* Header */}
+              <div className="flex items-center gap-3 mb-8">
+                <span className="material-symbols-outlined text-primary text-3xl">api</span>
+                <h3 className="font-headline font-bold text-xl uppercase tracking-wider text-on-surface">Neural API Nodes</h3>
+              </div>
+
+              {/* Create key form */}
+              <div className="flex gap-3 mb-6">
+                <input
+                  value={newKeyName}
+                  onChange={(e) => setNewKeyName(e.target.value)}
+                  onKeyDown={(e) => e.key === 'Enter' && handleCreateKey()}
+                  placeholder="Key name e.g. My CLI Tool"
+                  className="flex-1 bg-surface-container-lowest border border-white/10 rounded-lg px-4 py-2.5 text-sm text-on-surface placeholder:text-outline font-mono focus:outline-none focus:border-primary/40 transition-colors"
+                />
+                <button
+                  onClick={handleCreateKey}
+                  disabled={loading.createKey}
+                  className="px-5 py-2.5 rounded-lg bg-gradient-to-br from-primary to-primary-container text-on-primary font-bold text-xs uppercase tracking-wider hover:shadow-[0_0_15px_rgba(111,241,231,0.3)] active:scale-95 transition-all disabled:opacity-50 whitespace-nowrap"
+                >
+                  {loading.createKey ? 'Creating…' : '+ Generate Node'}
                 </button>
               </div>
-              <div className="overflow-x-auto">
-                <table className="w-full text-left border-separate border-spacing-y-3">
-                  <thead>
-                    <tr className="text-on-surface-variant text-xs uppercase tracking-widest font-bold">
-                      <th className="pb-2 pl-4">Node Name</th>
-                      <th className="pb-2">Encrypted Secret</th>
-                      <th className="pb-2">Access Level</th>
-                      <th className="pb-2 text-right pr-4">Control</th>
-                    </tr>
-                  </thead>
-                  <tbody>
-                    <tr className="bg-surface-container-lowest group hover:bg-surface-container-low transition-colors rounded-xl">
-                      <td className="py-4 pl-4 rounded-l-xl font-bold text-primary">Production_Main</td>
-                      <td className="py-4 font-mono text-xs opacity-60">sv_live_72kX92m...P8z1</td>
-                      <td className="py-4"><span className="px-2 py-1 bg-primary/10 text-primary text-[10px] rounded border border-primary/20">Read/Write</span></td>
-                      <td className="py-4 text-right pr-4 rounded-r-xl">
-                        <span className="material-symbols-outlined text-outline cursor-pointer hover:text-error transition-colors">delete</span>
-                      </td>
-                    </tr>
-                    <tr className="bg-surface-container-lowest group hover:bg-surface-container-low transition-colors">
-                      <td className="py-4 pl-4 rounded-l-xl font-bold text-primary">Observer_Analytics</td>
-                      <td className="py-4 font-mono text-xs opacity-60">sv_live_44nP11q...R2a5</td>
-                      <td className="py-4"><span className="px-2 py-1 bg-outline-variant/30 text-outline text-[10px] rounded border border-outline-variant">Read Only</span></td>
-                      <td className="py-4 text-right pr-4 rounded-r-xl">
-                        <span className="material-symbols-outlined text-outline cursor-pointer hover:text-error transition-colors">delete</span>
-                      </td>
-                    </tr>
-                  </tbody>
-                </table>
-              </div>
+
+              {/* Key list */}
+              {apiKeys.length === 0 ? (
+                <div className="text-center py-10 text-outline text-sm">
+                  No API keys yet. Create one above.
+                </div>
+              ) : (
+                <div className="flex flex-col divide-y divide-white/5">
+                  {apiKeys.map((key) => (
+                    <div key={key._id} className="flex items-center gap-4 py-4 group">
+                      {/* Name + prefix */}
+                      <div className="flex-1 min-w-0">
+                        <p className="font-bold text-on-surface text-sm truncate">{key.name}</p>
+                        <code className="text-xs text-outline font-mono">{key.keyPrefix}</code>
+                      </div>
+
+                      {/* Permission badges */}
+                      <div className="hidden sm:flex gap-1 shrink-0">
+                        {(key.permissions || []).map((p) => (
+                          <span
+                            key={p}
+                            className="px-2 py-0.5 rounded-full text-[10px] bg-primary/10 text-primary border border-primary/20 font-mono uppercase"
+                          >
+                            {p}
+                          </span>
+                        ))}
+                      </div>
+
+                      {/* Last used */}
+                      {key.lastUsedAt && (
+                        <span className="hidden lg:block text-xs text-outline shrink-0">
+                          {new Date(key.lastUsedAt).toLocaleDateString()}
+                        </span>
+                      )}
+
+                      {/* Revoke */}
+                      <button
+                        onClick={() => handleRevokeKey(key._id, key.name)}
+                        className="px-3 py-1.5 rounded-lg bg-error/10 text-error border border-error/20 text-xs font-bold hover:bg-error/20 active:scale-95 transition-all shrink-0"
+                      >
+                        Revoke
+                      </button>
+                    </div>
+                  ))}
+                </div>
+              )}
             </section>
             {/* Audit Log Terminal */}
             <section className="md:col-span-12 glass-card p-8 rounded-xl relative overflow-hidden">
               <div className="flex items-center gap-3 mb-8">
                 <span className="material-symbols-outlined text-secondary text-3xl">history_edu</span>
-                <h3 className="font-headline font-bold text-xl uppercase tracking-wider">Recent Telemetry</h3>
+                <h3 className="font-headline font-bold text-xl uppercase tracking-wider text-on-surface">Recent Telemetry</h3>
               </div>
               <div className="bg-surface-container-lowest p-6 rounded-lg font-mono text-sm leading-loose border border-white/5 max-h-80 overflow-y-auto custom-scrollbar">
-                <div className="flex gap-4 border-l-2 border-primary pl-4 mb-2 hover:bg-primary/5 transition-colors py-1 group">
-                  <span className="text-outline shrink-0">14:22:09</span>
-                  <span className="text-primary-dim">[SUCCESS]</span>
-                  <span className="text-on-surface">Vault "Project-Alpha" accessed by Node:Production_Main. IP: 192.168.1.42</span>
-                  <span className="ml-auto opacity-0 group-hover:opacity-100 transition-opacity text-primary-dim text-xs">VERIFIED</span>
-                </div>
-                <div className="flex gap-4 border-l-2 border-error pl-4 mb-2 hover:bg-error/5 transition-colors py-1 group">
-                  <span className="text-outline shrink-0">13:58:12</span>
-                  <span className="text-error">[DENIED]</span>
-                  <span className="text-on-surface">Invalid 2FA challenge response from unauthorized device: Nexus-7.</span>
-                  <span class="ml-auto opacity-0 group-hover:opacity-100 transition-opacity text-error text-xs">FLAGGED</span>
-                </div>
-                <div className="flex gap-4 border-l-2 border-secondary pl-4 mb-2 hover:bg-secondary/5 transition-colors py-1 group">
-                  <span className="text-outline shrink-0">11:04:45</span>
-                  <span className="text-secondary">[UPDATE]</span>
-                  <span className="text-on-surface">System Preferences changed: Multi-Factor Authentication strategy adjusted.</span>
-                  <span className="ml-auto opacity-0 group-hover:opacity-100 transition-opacity text-secondary text-xs">COMMITTED</span>
-                </div>
-                <div className="flex gap-4 border-l-2 border-primary pl-4 mb-2 hover:bg-primary/5 transition-colors py-1 group">
-                  <span className="text-outline shrink-0">09:15:33</span>
-                  <span className="text-primary-dim">[SUCCESS]</span>
-                  <span className="text-on-surface">Database encryption keys rotated successfully. Quantum-safe entropy confirmed.</span>
-                  <span className="ml-auto opacity-0 group-hover:opacity-100 transition-opacity text-primary-dim text-xs">VERIFIED</span>
-                </div>
-                <div className="flex gap-4 border-l-2 border-outline pl-4 mb-2 hover:bg-white/5 transition-colors py-1 group">
-                  <span className="text-outline shrink-0">08:00:01</span>
-                  <span className="text-outline">[SYSTEM]</span>
-                  <span className="text-on-surface">Daily security posture scan completed. 0 vulnerabilities detected.</span>
-                  <span className="ml-auto opacity-0 group-hover:opacity-100 transition-opacity text-outline text-xs">IDLE</span>
-                </div>
+                {(() => {
+                  const ACTION_COLOR = {
+                    LOGIN:          { border: 'border-[#C8FF57]', badge: 'bg-[rgba(200,255,87,0.1)] text-[#C8FF57]' },
+                    LOGOUT:         { border: 'border-primary',   badge: 'bg-primary/10 text-primary' },
+                    REGISTER:       { border: 'border-[#C8FF57]', badge: 'bg-[rgba(200,255,87,0.1)] text-[#C8FF57]' },
+                    SECRET_READ:    { border: 'border-primary',   badge: 'bg-primary/10 text-primary' },
+                    SECRET_CREATE:  { border: 'border-[#C8FF57]', badge: 'bg-[rgba(200,255,87,0.1)] text-[#C8FF57]' },
+                    SECRET_UPDATE:  { border: 'border-primary',   badge: 'bg-primary/10 text-primary' },
+                    SECRET_DELETE:  { border: 'border-error',     badge: 'bg-error/10 text-error' },
+                    LOGIN_FAILED:   { border: 'border-error',     badge: 'bg-error/10 text-error' },
+                    TWO_FA_ENABLED: { border: 'border-[#C8FF57]', badge: 'bg-[rgba(200,255,87,0.1)] text-[#C8FF57]' },
+                    APIKEY_CREATED: { border: 'border-secondary', badge: 'bg-secondary/10 text-secondary' },
+                    APIKEY_USED:    { border: 'border-primary',   badge: 'bg-primary/10 text-primary' },
+                    APIKEY_REVOKED: { border: 'border-error',     badge: 'bg-error/10 text-error' },
+                  };
+
+                  return auditLogs.length === 0 ? (
+                    <div className="text-center py-8 text-outline">No activity recorded yet.</div>
+                  ) : (
+                    auditLogs.map((log) => {
+                      const s = ACTION_COLOR[log.action] || ACTION_COLOR.SECRET_READ;
+                      return (
+                        <div
+                          key={log._id}
+                          className={`flex items-center gap-3 border-l-2 ${s.border} pl-4 py-2 mb-1 hover:bg-white/5 transition-colors group`}
+                        >
+                          {/* Action badge */}
+                          <span className={`px-2 py-0.5 rounded-full text-[10px] font-bold uppercase whitespace-nowrap ${s.badge}`}>
+                            {log.action.replace(/_/g, ' ')}
+                          </span>
+
+                          {/* IP */}
+                          <span className="flex-1 text-xs text-outline truncate">
+                            {log.ipAddress}
+                          </span>
+
+                          {/* Timestamp */}
+                          <span className="text-xs text-outline/60 shrink-0 hidden sm:block">
+                            {new Date(log.createdAt).toLocaleString()}
+                          </span>
+
+                          {/* Success indicator */}
+                          <span className="shrink-0 text-sm">
+                            {log.success ? '✅' : '❌'}
+                          </span>
+                        </div>
+                      );
+                    })
+                  );
+                })()}
               </div>
             </section>
           </div>
