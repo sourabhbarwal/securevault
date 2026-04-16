@@ -1,13 +1,14 @@
 import { Link, useNavigate, useLocation } from 'react-router-dom';
 import { motion, AnimatePresence }        from 'framer-motion';
-import { Lock, Shield, Settings, LogOut, Vault, ChevronDown } from 'lucide-react';
+import { Lock, Shield, Settings, LogOut, Vault, ChevronDown, ShieldAlert } from 'lucide-react';
 import { useState } from 'react';
 import toast        from 'react-hot-toast';
 import { useAuth }  from '../../context/AuthContext';
 
 const NAV_LINKS = [
-  { path: '/vault',    label: 'Vault',    icon: Vault    },
-  { path: '/settings', label: 'Settings', icon: Settings },
+  { path: '/vault',    label: 'Vault',    icon: Vault        },
+  { path: '/audit',   label: 'Audit',    icon: ShieldAlert  },
+  { path: '/settings', label: 'Settings', icon: Settings    },
 ];
 
 export default function Navbar() {

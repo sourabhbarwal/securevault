@@ -9,6 +9,7 @@ import RegisterPage   from './pages/RegisterPage';
 import TwoFactorPage  from './pages/TwoFactorPage';   // we create this in Phase 15
 import VaultDashboard from './pages/VaultDashboard';  // the name your agent used
 import SettingsPage   from './pages/SettingsPage';
+import AuditPage      from './pages/AuditPage';
 
 function AppLoader() {
   return (
@@ -65,6 +66,7 @@ export default function App() {
       {/* Protected routes */}
       <Route path="/vault"    element={<Protected><VaultDashboard /></Protected>} />
       <Route path="/settings" element={<Protected><SettingsPage /></Protected>} />
+      <Route path="/audit"    element={<Protected><AuditPage /></Protected>} />
 
       {/* Fallback */}
       <Route path="*" element={<Navigate to="/login" replace />} />

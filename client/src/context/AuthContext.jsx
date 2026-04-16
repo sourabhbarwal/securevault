@@ -7,7 +7,8 @@ const AuthContext = createContext(null);
 export function AuthProvider({ children }) {
   const [user,    setUser]    = useState(null);
   const [aesKey,  setAesKey]  = useState(null);
-  const [loading, setLoading] = useState(true);  // start true — we check session first
+  const [token,   setToken]   = useState(null);   // raw JWT for SSE EventSource
+  const [loading, setLoading] = useState(true);
 
   useEffect(() => {
     const restoreSession = async () => {
@@ -17,6 +18,7 @@ export function AuthProvider({ children }) {
         if (data?.data?.accessToken) {
           axios.defaults.headers.common['Authorization'] =
             `Bearer ${data.data.accessToken}`;
+          setToken(data.data.accessToken);
 
           const meResponse = await axios.get('/auth/me');
           setUser(meResponse.data.data.user);
@@ -44,6 +46,7 @@ export function AuthProvider({ children }) {
     const { accessToken, user: userData, encryptionSalt } = data.data;
 
     axios.defaults.headers.common['Authorization'] = `Bearer ${accessToken}`;
+    setToken(accessToken);
 
     const key = await deriveKey(password, encryptionSalt);
     setAesKey(key);
@@ -56,6 +59,7 @@ export function AuthProvider({ children }) {
     accessToken, userData, encryptionSalt, masterPassword
   ) => {
     axios.defaults.headers.common['Authorization'] = `Bearer ${accessToken}`;
+    setToken(accessToken);
     const key = await deriveKey(masterPassword, encryptionSalt);
     setAesKey(key);
     setUser(userData);
@@ -70,12 +74,14 @@ export function AuthProvider({ children }) {
     delete axios.defaults.headers.common['Authorization'];
     setUser(null);
     setAesKey(null);
+    setToken(null);
   }, []);
 
   return (
     <AuthContext.Provider value={{
-      user, aesKey, loading,
+      user, aesKey, accessToken: token, loading,
       login, logout, completeLogin, setUser,
+
     }}>
       {children}
     </AuthContext.Provider>
