@@ -1,6 +1,5 @@
 import React from 'react';
 import { useState, useEffect, useCallback } from 'react';
-import { useNavigate }                        from 'react-router-dom';
 import { motion, AnimatePresence }           from 'framer-motion';
 import toast                                 from 'react-hot-toast';
 import { useAuth }                           from '../context/AuthContext';
@@ -10,7 +9,6 @@ import { encryptSecret, decryptSecret }      from '../utils/encryption';
 export default function VaultDashboard() {
       // ── Auth + State ──────────────────────────────────────────
     const { aesKey, logout } = useAuth();
-    const navigate = useNavigate();
 
     const [secrets,  setSecrets]  = useState([]);
     const [loading,  setLoading]  = useState(true);
@@ -146,30 +144,9 @@ export default function VaultDashboard() {
     };
     
   return (
-    <div className="font-body selection:bg-primary/30">
+    <div className="font-body selection:bg-primary/30" style={{ paddingTop: '64px' }}>
       <div className="aurora-bg"></div>
       <div className="fixed inset-0 particle-dots pointer-events-none z-0"></div>
-      {/* TopAppBar */}
-      <header className="bg-[#0b0e18]/80 backdrop-blur-lg docked full-width top-0 z-50 border-b border-white/5 shadow-[0_8px_32px_0_rgba(0,0,0,0.37)] flex justify-between items-center px-8 py-4 w-full sticky">
-        <div className="flex items-center gap-3">
-          <span className="material-symbols-outlined text-[#7EFFF5] text-3xl" data-icon="lock">lock</span>
-          <span className="text-2xl font-black bg-gradient-to-br from-[#6ff1e7] to-[#17b3aa] bg-clip-text text-transparent font-['Space_Grotesk'] tracking-tight">SecureVault</span>
-        </div>
-        <div className="hidden md:flex items-center gap-8">
-          <nav className="flex items-center gap-6">
-            <a className="text-[#7EFFF5] border-b-2 border-[#7EFFF5] pb-1 font-['Space_Grotesk'] font-bold tracking-tight transition-all duration-300" href="/vault">Vaults</a>
-            <a className="text-slate-400 font-medium font-['Space_Grotesk'] hover:text-[#7EFFF5] transition-all duration-300" href="#">Audit Log</a>
-          </nav>
-          <div className="h-8 w-[1px] bg-white/10 mx-2"></div>
-          <div className="flex items-center gap-4">
-            <button className="text-slate-400 hover:text-[#7EFFF5] transition-all"><span className="material-symbols-outlined" data-icon="notifications">notifications</span></button>
-            <button onClick={() => navigate('/settings')} className="text-slate-400 hover:text-[#7EFFF5] transition-all"><span className="material-symbols-outlined" data-icon="settings">settings</span></button>
-            <div className="w-10 h-10 rounded-full overflow-hidden border border-primary/20">
-              <img alt="User Avatar" className="w-full h-full object-cover" src="https://lh3.googleusercontent.com/aida-public/AB6AXuAkFviRK1ADe_w1HnWY_oSSP-tMgjxfOPw9InvycQ8LlGj4ihlz_oMnte-ePq3XfoPvoRVOedIqJcEWzcFGUPn0EzgfJNkNFuCXvuxDOQvJ77ojXuXzGij6R3sQhHqZP6BGQhEBoM_GEol92b_PgX8yM6Id_dkWUMCge7yKTDoXy2AZ__j7d4GPVKyYw5WIdSmJbhsNiyUymoR8mjNSp7a17ZLctLA_j6GotiP2Fq7Ubonc9NlDAUi7lDrkF_DM-K8RnydtwGYnXIQ" />
-            </div>
-          </div>
-        </div>
-      </header>
 
       <div className="flex min-h-screen">
         {/* SideNavBar */}

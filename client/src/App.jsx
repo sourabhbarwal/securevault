@@ -1,6 +1,7 @@
 import { Routes, Route, Navigate } from 'react-router-dom';
 import { useAuth } from './context/AuthContext';
 import React from 'react';
+import Navbar from './components/layout/Navbar';
 // Pages — adjust import paths if your agent named files differently
 import LandingPage    from './pages/LandingPage';
 import LoginPage      from './pages/LoginPage';
@@ -51,7 +52,9 @@ function Public({ children }) {
 
 export default function App() {
   return (
-    <Routes>
+    <>
+      <Navbar />
+      <Routes>
       {/* Public routes */}
       <Route path="/"           element={<Navigate to="/login" replace />} />
       <Route path="/home"       element={<LandingPage />} />
@@ -65,6 +68,7 @@ export default function App() {
 
       {/* Fallback */}
       <Route path="*" element={<Navigate to="/login" replace />} />
-    </Routes>
+      </Routes>
+    </>
   );
 }
