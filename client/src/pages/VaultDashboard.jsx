@@ -16,6 +16,8 @@ export default function VaultDashboard() {
   const [showAdd,    setShowAdd]    = useState(false);
   const [revealed,   setRevealed]   = useState(null);
   const [recentLogs, setRecentLogs] = useState([]);
+  const [confirmDel, setConfirmDel] = useState(null); // secret._id pending delete
+
 
   // ── Fetch secrets ──────────────────────────────────────────
   const fetchSecrets = useCallback(async () => {
@@ -132,15 +134,16 @@ export default function VaultDashboard() {
     }
   };
 
-  // ── DELETE ─────────────────────────────────────────────────
-  const handleDelete = async (id, name) => {
-    if (!window.confirm(`Permanently delete "${name}"?\nThis cannot be undone.`)) return;
+  // ── DELETE (two-step: set confirm state → execute) ────────
+  const handleDelete = async (id) => {
     try {
       await axios.delete(`/vault/${id}`);
       setSecrets((prev) => prev.filter((s) => s._id !== id));
+      setConfirmDel(null);
       toast.success('Secret deleted');
-    } catch { toast.error('Delete failed'); }
+    } catch { toast.error('Delete failed'); setConfirmDel(null); }
   };
+
 
   // ── TOGGLE FAVOURITE ───────────────────────────────────────
   const handleToggleFav = async (secret) => {
@@ -317,14 +320,31 @@ export default function VaultDashboard() {
                     >
                       <span className="material-symbols-outlined">{secret.isFavorite ? 'star' : 'star_outline'}</span>
                     </button>
-                    <button
-                      onClick={(e) => { e.stopPropagation(); handleDelete(secret._id, secret.name); }}
-                      className="w-10 h-10 rounded-lg hover:bg-error/10 hover:text-error transition-colors flex items-center justify-center text-outline"
-                      title="Delete secret"
-                    >
-                      <span className="material-symbols-outlined">delete</span>
-                    </button>
+
+                    {/* Inline delete confirmation */}
+                    {confirmDel === secret._id ? (
+                      <div className="flex items-center gap-1" onClick={(e) => e.stopPropagation()}>
+                        <span className="text-xs text-error font-bold whitespace-nowrap">Delete?</span>
+                        <button
+                          onClick={(e) => { e.stopPropagation(); handleDelete(secret._id); }}
+                          className="px-2 py-1 rounded bg-error/20 text-error text-xs font-bold hover:bg-error/35 transition-colors"
+                        >Yes</button>
+                        <button
+                          onClick={(e) => { e.stopPropagation(); setConfirmDel(null); }}
+                          className="px-2 py-1 rounded bg-white/5 text-outline text-xs font-bold hover:bg-white/10 transition-colors"
+                        >No</button>
+                      </div>
+                    ) : (
+                      <button
+                        onClick={(e) => { e.stopPropagation(); setConfirmDel(secret._id); }}
+                        className="w-10 h-10 rounded-lg hover:bg-error/10 hover:text-error transition-colors flex items-center justify-center text-outline"
+                        title="Delete secret"
+                      >
+                        <span className="material-symbols-outlined">delete</span>
+                      </button>
+                    )}
                   </div>
+
                 </div>
               );
             })

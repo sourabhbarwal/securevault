@@ -1,5 +1,4 @@
   import React from 'react';
-  import AuroraBackground from '../components/ui/AuroraBackground';
   import Navbar from '../components/layout/Navbar';
   import { useState } from 'react';
   import { useNavigate, Link } from 'react-router-dom';
@@ -57,7 +56,8 @@
   };
     return (
       <div className="font-body text-on-surface min-h-screen bg-background">
-        <AuroraBackground />
+        <div className="aurora-bg" />
+        <div className="fixed inset-0 particle-dots pointer-events-none z-0" />
         <Navbar />
 
         {/* Main Content Canvas */}
