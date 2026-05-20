@@ -57,10 +57,9 @@ export default function App() {
       <Navbar />
       <Routes>
       {/* Public routes */}
-      <Route path="/"           element={<Navigate to="/login" replace />} />
-      <Route path="/home"       element={<LandingPage />} />
-      <Route path="/login"      element={<Public><LoginPage /></Public>} />
-      <Route path="/register"   element={<Public><RegisterPage /></Public>} />
+      <Route path="/"          element={<Public><LandingPage /></Public>} />
+      <Route path="/login"     element={<Public><LoginPage /></Public>} />
+      <Route path="/register"  element={<Public><RegisterPage /></Public>} />
       <Route path="/verify-2fa" element={<TwoFactorPage />} />
 
       {/* Protected routes */}
@@ -69,7 +68,7 @@ export default function App() {
       <Route path="/audit"    element={<Protected><AuditPage /></Protected>} />
 
       {/* Fallback */}
-      <Route path="*" element={<Navigate to="/login" replace />} />
+      <Route path="*" element={<Navigate to="/" replace />} />
       </Routes>
     </>
   );

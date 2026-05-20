@@ -17,9 +17,9 @@ export default function Navbar() {
   const location          = useLocation();
   const [menuOpen, setMenuOpen] = useState(false);
 
-  // Hide navbar on auth pages
-  const authPages = ['/login', '/register', '/verify-2fa'];
-  if (authPages.includes(location.pathname)) return null;
+  // Hide navbar on auth pages and landing page (it has its own header)
+  const hiddenPages = ['/', '/login', '/register', '/verify-2fa'];
+  if (hiddenPages.includes(location.pathname)) return null;
 
   const handleLogout = async () => {
     try {

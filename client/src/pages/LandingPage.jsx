@@ -5,30 +5,24 @@ export default function LandingPage() {
   return (
     <div className="bg-background text-on-background font-body selection:bg-primary/30 selection:text-primary min-h-screen relative overflow-hidden text-left">
       <div className="aurora-bg"></div>
-      {/* TopAppBar Navigation Shell */}
-      <header className="bg-[#0b0e18]/80 backdrop-blur-lg docked full-width top-0 z-50 border-b border-white/5 shadow-[0_8px_32px_0_rgba(0,0,0,0.37)] flex justify-between items-center px-8 py-4 w-full">
+      {/* Public Header */}
+      <header className="fixed top-0 w-full bg-[#0b0e18]/80 backdrop-blur-lg z-50 border-b border-white/5 shadow-[0_8px_32px_0_rgba(0,0,0,0.37)] flex justify-between items-center px-8 py-4">
         <div className="flex items-center gap-3">
-          <span className="material-symbols-outlined text-[#7EFFF5] text-2xl" data-icon="lock">lock</span>
+          <span className="material-symbols-outlined text-[#7EFFF5] text-2xl">lock</span>
           <span className="font-['Space_Grotesk'] text-2xl font-black bg-gradient-to-br from-[#6ff1e7] to-[#17b3aa] bg-clip-text text-transparent">SecureVault</span>
         </div>
         <nav className="hidden md:flex items-center gap-8 font-['Space_Grotesk'] font-bold tracking-tight">
-          <Link className="text-[#7EFFF5] border-b-2 border-[#7EFFF5] pb-1 hover:text-[#7EFFF5] transition-all duration-300" to="/dashboard">Vaults</Link>
-          <Link className="text-slate-400 font-medium hover:text-[#7EFFF5] transition-all duration-300" to="/">Features</Link>
-          <Link className="text-slate-400 font-medium hover:text-[#7EFFF5] transition-all duration-300" to="/">Compliance</Link>
-          <Link className="text-slate-400 font-medium hover:text-[#7EFFF5] transition-all duration-300" to="/">Enterprise</Link>
+          <a className="text-slate-400 font-medium hover:text-[#7EFFF5] transition-all duration-300" href="#features">Features</a>
+          <a className="text-slate-400 font-medium hover:text-[#7EFFF5] transition-all duration-300" href="#audit">Audit</a>
+          <a className="text-slate-400 font-medium hover:text-[#7EFFF5] transition-all duration-300" href="#cta">Enterprise</a>
         </nav>
-        <div className="flex items-center gap-6">
-          <div className="hidden lg:flex items-center bg-surface-container-lowest rounded-full px-4 py-1.5 border border-white/5">
-            <span className="material-symbols-outlined text-outline text-sm mr-2" data-icon="search">search</span>
-            <span className="text-xs text-outline font-label uppercase tracking-widest">Search encrypted indexes</span>
-          </div>
-          <div className="flex items-center gap-4">
-            <span className="material-symbols-outlined text-slate-400 cursor-pointer hover:text-[#7EFFF5] transition-all duration-300" data-icon="notifications">notifications</span>
-            <span className="material-symbols-outlined text-slate-400 cursor-pointer hover:text-[#7EFFF5] transition-all duration-300" data-icon="settings">settings</span>
-            <div className="w-10 h-10 rounded-full border border-primary/20 p-0.5">
-              <img alt="User Avatar" className="w-full h-full rounded-full object-cover" src="https://lh3.googleusercontent.com/aida-public/AB6AXuCt2taxt9afonvk39GQL0sS1FtGtMc4aoiWmCiDbHNE5WP4uSPDHHtuGluLkBFqm1IcrAY81uUY5ynGnyUQZGEKP4DfhuTnK4yAhc8OUxqVccrvnXF4HkWlRhFV6j11CuzfF3v2dDfYckoK0QKBuTCVtrWSgk5zByF1b5elQp5Omf7Usws5DmSH-1RawckFYHd29sbtMcKqqQnY-wtS0Tl6D3cF8-4YTD7ai-q6lSuGZDIdRemU9lzMqwiqHK02nx_2dDo_VvVWtSc" />
-            </div>
-          </div>
+        <div className="flex items-center gap-4">
+          <Link to="/login" className="text-slate-400 font-['Space_Grotesk'] font-bold hover:text-[#7EFFF5] transition-all duration-300 text-sm">
+            Sign In
+          </Link>
+          <Link to="/register" className="px-5 py-2 bg-gradient-to-br from-[#6ff1e7] to-[#17b3aa] text-[#002826] font-['Space_Grotesk'] font-bold text-sm rounded-lg hover:opacity-90 active:scale-95 transition-all shadow-[0_4px_15px_rgba(111,241,231,0.3)]">
+            Get Started
+          </Link>
         </div>
       </header>
 
@@ -43,7 +37,7 @@ export default function LandingPage() {
         </div>
 
         {/* Hero Section */}
-        <section className="relative z-10 pt-32 pb-20 px-8 container mx-auto">
+        <section className="relative z-10 pt-40 pb-20 px-8 container mx-auto">
           <div className="grid lg:grid-cols-2 gap-16 items-center">
             <div className="space-y-8">
               <div className="inline-flex items-center gap-2 px-3 py-1 rounded-full bg-primary/5 border border-primary/10">
@@ -92,7 +86,7 @@ export default function LandingPage() {
         </section>
 
         {/* Feature Cards Section */}
-        <section className="container mx-auto px-8 py-20">
+        <section id="features" className="container mx-auto px-8 py-20">
           <div className="grid md:grid-cols-12 gap-6">
             {/* Zero-Knowledge Card */}
             <div className="md:col-span-7 group">
@@ -135,7 +129,7 @@ export default function LandingPage() {
             </div>
 
             {/* Audit Logs / Terminal Card */}
-            <div className="md:col-span-12 group">
+            <div id="audit" className="md:col-span-12 group">
               <div className="glass-card p-8 rounded-2xl border border-white/5 shadow-2xl grid md:grid-cols-2 gap-8 items-center">
                 <div className="bg-surface-container-lowest p-6 rounded-xl font-mono text-xs border border-white/5 max-h-48 overflow-hidden relative">
                   <div className="flex items-center gap-2 mb-4 text-outline border-b border-white/5 pb-2">
@@ -168,7 +162,7 @@ export default function LandingPage() {
         </section>
 
         {/* CTAs / Social Proof */}
-        <section className="container mx-auto px-8 py-32 text-center relative overflow-hidden">
+        <section id="cta" className="container mx-auto px-8 py-32 text-center relative overflow-hidden">
           <div className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-[800px] h-[400px] bg-secondary/5 rounded-full blur-[120px] pointer-events-none"></div>
           <div className="relative z-10 max-w-3xl mx-auto">
             <h2 className="font-headline text-5xl font-bold mb-8 leading-tight">Ready to transcend standard security?</h2>
@@ -176,8 +170,8 @@ export default function LandingPage() {
               <Link to="/register" className="px-10 py-5 bg-gradient-to-br from-primary to-primary-container text-on-primary-fixed font-label font-bold uppercase tracking-widest rounded-md shadow-2xl hover:scale-105 transition-transform active:scale-95 inline-flex items-center justify-center">
                 Create Personal Vault
               </Link>
-              <Link to="/dashboard" className="px-10 py-5 bg-tertiary-container text-on-tertiary-container font-label font-bold uppercase tracking-widest rounded-md hover:bg-tertiary-dim transition-colors inline-flex items-center justify-center">
-                Enterprise Inquiry
+              <Link to="/login" className="px-10 py-5 bg-tertiary-container text-on-tertiary-container font-label font-bold uppercase tracking-widest rounded-md hover:bg-tertiary-dim transition-colors inline-flex items-center justify-center">
+                Sign In
               </Link>
             </div>
             <div className="mt-16 flex justify-center items-center gap-12 opacity-40 grayscale hover:grayscale-0 transition-all">
@@ -245,7 +239,7 @@ export default function LandingPage() {
           </div>
         </div>
         <div className="container mx-auto mt-20 pt-8 border-t border-white/5 flex flex-col md:flex-row justify-between items-center gap-4 text-[10px] font-mono text-outline">
-          <span>© 2024 SECUREVAULT PROTOCOL. ALL RIGHTS RESERVED.</span>
+          <span>© 2026 SECUREVAULT PROTOCOL. ALL RIGHTS RESERVED.</span>
           <span>01010011 01000101 01000011 01010101 01010010 01000101</span>
         </div>
       </footer>
