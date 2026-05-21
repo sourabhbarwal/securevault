@@ -5,16 +5,19 @@ import { useQueryClient } from '@tanstack/react-query';
 
 const SocketContext = createContext(null);
 
+const getSocketUrl = () => {
+  const apiUrl = import.meta.env.VITE_API_URL || 'http://localhost:5000/api';
+  return apiUrl.replace(/\/api\/?$/, '');
+};
+
 export function SocketProvider({ children }) {
-  const { user }      = useAuth();
+  const { user, accessTokenRef }      = useAuth();
   const qc            = useQueryClient();
   const socketRef     = useRef(null);
   const [connected, setConnected] = useState(false);
+  const [transport, setTransport] = useState('—');
 
   useEffect(() => {
-    // Get access token from axios defaults
-    const token = document.cookie; // fallback
-    const authHeader = window._axiosToken; // set by axiosInstance
 
     if (!user) {
       // Disconnect if user logs out
@@ -22,33 +25,62 @@ export function SocketProvider({ children }) {
         socketRef.current.disconnect();
         socketRef.current = null;
         setConnected(false);
+        setTransport('—');
       }
       return;
     }
 
     // Get token from axios defaults
-    const axiosToken = window.__svToken;
-    if (!axiosToken) return;
+    const token = accessTokenRef.current;
+    if (!token) {
+      console.warn('Socket: no access token available yet');
+      return;
+    }
 
-    const socket = io(
-      import.meta.env.VITE_API_URL?.replace('/api', '') || 'http://localhost:5000',
-      {
-        auth:        { token: axiosToken },
-        transports:  ['websocket'],
+    if (socketRef.current?.connected) return;
+
+    const socketUrl = getSocketUrl();
+    console.log('⚡ Connecting socket to:', socketUrl);
+
+    const socket = io( socketUrl, {
+        auth:        { token},
+        transports:  ['polling','websocket'],
         reconnection: true,
-        reconnectionAttempts: 5,
-        reconnectionDelay:    1000,
+        reconnectionAttempts: 10,
+        reconnectionDelay:    2000,
+        reconnectionDelayMax: 10000,
+        timeout: 20000,
       }
     );
 
-    socket.on('connect', () => {
-      console.log('⚡ Socket connected');
+    socket.on('connect', () => { 
+      console.log(`⚡ Socket connected | id: ${socket.id} | transport: ${socket.conn.transport.name}`);
       setConnected(true);
+      setTransport(socket.conn.transport.name);
     });
 
-    socket.on('disconnect', () => {
-      console.log('🔌 Socket disconnected');
+    socket.on('connect', () => {
+      socket.conn.on('upgrade', (newTransport) => {
+        console.log(`⬆️ Transport upgraded to: ${newTransport.name}`);
+        setTransport(newTransport.name);
+      });
+    });
+
+    socket.on('disconnect', (reason) => {
+      console.log(`🔌 Socket disconnected: ${reason}`);
       setConnected(false);
+      setTransport('—');
+    });
+
+    socket.on('connect_error', (err) => {
+      // Log but don't spam — reconnection is automatic
+      console.warn(`Socket connect_error: ${err.message}`);
+      setConnected(false);
+    });
+
+    // ── Server confirmation ───────────────────────────────────
+    socket.on('connected', ({ userId }) => {
+      console.log(`🔐 Socket authenticated for user: ${userId}`);
     });
 
     // ── Real-time vault events ────────────────────────────
@@ -77,13 +109,15 @@ export function SocketProvider({ children }) {
     socketRef.current = socket;
 
     return () => {
+      console.log('🧹 Cleaning up socket');
       socket.disconnect();
       socketRef.current = null;
+      setConnected(false);
     };
   }, [user, qc]);
 
   return (
-    <SocketContext.Provider value={{ connected, socket: socketRef.current }}>
+    <SocketContext.Provider value={{ connected, transport, socket: socketRef.current, }}>
       {children}
     </SocketContext.Provider>
   );
