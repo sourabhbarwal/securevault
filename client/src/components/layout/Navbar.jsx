@@ -17,7 +17,7 @@ export default function Navbar() {
   const navigate          = useNavigate();
   const location          = useLocation();
   const [menuOpen, setMenuOpen] = useState(false);
-  const { connected, transport} = useSocket();
+  const { connected } = useSocket();
 
   // Hide navbar on auth pages and landing page (it has its own header)
   const hiddenPages = ['/', '/login', '/register', '/verify-2fa'];
@@ -70,11 +70,10 @@ export default function Navbar() {
         <div style={{
           width: 7, height: 7, borderRadius: '50%',
           background: connected ? '#C8FF57' : '#FF3CAC',
-          boxShadow: connected ? '0 0 8px #C8FF57' : '0 0 8px #FF3CAC',
-          transition: 'all 0.4s',
-          flexShrink: 0,
-          animation:  connected ? 'none' : 'glow-pulse-pink 1.5s ease-in-out infinite',
-        }} title={connected ? 'Real-time connected via ${transport}' : 'Reconnecting...'} />
+          boxShadow: connected ? '0 0 6px #C8FF57' : '0 0 6px #FF3CAC',
+          transition: 'all 0.3s',
+          marginLeft: '4px',
+        }} title={connected ? 'Real-time connected' : 'Reconnecting...'} />
       </Link>
 
       {/* ── Nav links ────────────────────────────────────── */}

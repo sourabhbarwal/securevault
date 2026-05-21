@@ -1,4 +1,4 @@
-import { createContext, useContext, useState, useEffect, useCallback, useRef } from 'react';
+import { createContext, useContext, useState, useEffect, useCallback } from 'react';
 import axios from '../api/axiosInstance';
 import { deriveKey } from '../utils/encryption';
 
@@ -7,25 +7,8 @@ const AuthContext = createContext(null);
 export function AuthProvider({ children }) {
   const [user,    setUser]    = useState(null);
   const [aesKey,  setAesKey]  = useState(null);
-  // const [token,   setToken]   = useState(null);   // raw JWT for SSE EventSource
+  const [token,   setToken]   = useState(null);   // raw JWT for SSE EventSource
   const [loading, setLoading] = useState(true);
-
-  // Using a ref avoids re-render cycles when token changes
-  const accessTokenRef = useRef(null);
-  useEffect(() => {
-    window.__authRef = accessTokenRef;
-    return () => { delete window.__authRef; };
-  }, []);
-  // ── Helper: set token in both axios defaults and ref ────────
-  const setToken = (token) => {
-    if (token) {
-      axios.defaults.headers.common['Authorization'] = `Bearer ${token}`;
-      accessTokenRef.current = token;
-    } else {
-      delete axios.defaults.headers.common['Authorization'];
-      accessTokenRef.current = null;
-    }
-  };
 
   useEffect(() => {
     const restoreSession = async () => {
@@ -33,7 +16,10 @@ export function AuthProvider({ children }) {
         const { data } = await axios.post('/auth/refresh');
 
         if (data?.data?.accessToken) {
+          axios.defaults.headers.common['Authorization'] =
+            `Bearer ${data.data.accessToken}`;
           setToken(data.data.accessToken);
+
           const meResponse = await axios.get('/auth/me');
           setUser(meResponse.data.data.user);
         }
@@ -58,16 +44,21 @@ export function AuthProvider({ children }) {
     }
 
     const { accessToken, user: userData, encryptionSalt } = data.data;
+
+    axios.defaults.headers.common['Authorization'] = `Bearer ${accessToken}`;
     setToken(accessToken);
+
     const key = await deriveKey(password, encryptionSalt);
     setAesKey(key);
     setUser(userData);
+
     return { success: true };
   }, []);
 
   const completeLogin = useCallback(async (
     accessToken, userData, encryptionSalt, masterPassword
   ) => {
+    axios.defaults.headers.common['Authorization'] = `Bearer ${accessToken}`;
     setToken(accessToken);
     const key = await deriveKey(masterPassword, encryptionSalt);
     setAesKey(key);
@@ -80,6 +71,7 @@ export function AuthProvider({ children }) {
     } catch {
       // Logout failed on server side — still clear client state
     }
+    delete axios.defaults.headers.common['Authorization'];
     setUser(null);
     setAesKey(null);
     setToken(null);
@@ -87,9 +79,9 @@ export function AuthProvider({ children }) {
 
   return (
     <AuthContext.Provider value={{
-      user, aesKey, loading,
+      user, aesKey, accessToken: token, loading,
       login, logout, completeLogin, setUser,
-      accessTokenRef,
+
     }}>
       {children}
     </AuthContext.Provider>
