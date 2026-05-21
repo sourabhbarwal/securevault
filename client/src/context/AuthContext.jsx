@@ -46,6 +46,7 @@ export function AuthProvider({ children }) {
     const { accessToken, user: userData, encryptionSalt } = data.data;
 
     axios.defaults.headers.common['Authorization'] = `Bearer ${accessToken}`;
+    window.__svToken = accessToken;
     setToken(accessToken);
 
     const key = await deriveKey(password, encryptionSalt);
@@ -59,6 +60,7 @@ export function AuthProvider({ children }) {
     accessToken, userData, encryptionSalt, masterPassword
   ) => {
     axios.defaults.headers.common['Authorization'] = `Bearer ${accessToken}`;
+    window.__svToken = accessToken;
     setToken(accessToken);
     const key = await deriveKey(masterPassword, encryptionSalt);
     setAesKey(key);

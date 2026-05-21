@@ -4,6 +4,7 @@ import { Lock, Shield, Settings, LogOut, Vault, ChevronDown, ShieldAlert } from 
 import { useState } from 'react';
 import toast        from 'react-hot-toast';
 import { useAuth }  from '../../context/AuthContext';
+import { useSocket } from '../../context/SocketContext';
 
 const NAV_LINKS = [
   { path: '/vault',    label: 'Vault',    icon: Vault        },
@@ -16,6 +17,7 @@ export default function Navbar() {
   const navigate          = useNavigate();
   const location          = useLocation();
   const [menuOpen, setMenuOpen] = useState(false);
+  const { connected } = useSocket();
 
   // Hide navbar on auth pages and landing page (it has its own header)
   const hiddenPages = ['/', '/login', '/register', '/verify-2fa'];
@@ -65,6 +67,13 @@ export default function Navbar() {
         <span style={{ fontFamily: '"Syne", sans-serif', fontSize: '18px', fontWeight: 800, color: '#E8EDF8' }}>
           SecureVault
         </span>
+        <div style={{
+          width: 7, height: 7, borderRadius: '50%',
+          background: connected ? '#C8FF57' : '#FF3CAC',
+          boxShadow: connected ? '0 0 6px #C8FF57' : '0 0 6px #FF3CAC',
+          transition: 'all 0.3s',
+          marginLeft: '4px',
+        }} title={connected ? 'Real-time connected' : 'Reconnecting...'} />
       </Link>
 
       {/* ── Nav links ────────────────────────────────────── */}

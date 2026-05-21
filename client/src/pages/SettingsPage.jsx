@@ -1,15 +1,21 @@
 import React from 'react';
-import { useState, useEffect } from 'react';
+import { useState } from 'react';
 import toast   from 'react-hot-toast';
 import { useAuth } from '../context/AuthContext';
 import axios   from '../api/axiosInstance';
+import { useApiKeys, useCreateApiKey, useRevokeApiKey, useAuditLogs } from '../hooks/useVault';
 
 export default function SettingsPage() {
   const { user, setUser, logout } = useAuth();
 
-  // â”€â”€ State â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
-  const [apiKeys,    setApiKeys]    = useState([]);
-  const [auditLogs,  setAuditLogs]  = useState([]);
+  // ── React Query hooks ───────────────────────────────────────
+  const { data: apiKeys = [] }              = useApiKeys();
+  const { data: auditData }                 = useAuditLogs(1);
+  const auditLogs                           = auditData?.logs || [];
+  const createKey                           = useCreateApiKey();
+  const revokeKey                           = useRevokeApiKey();
+
+  // ── Local UI state ──────────────────────────────────────────
   const [qrCode,     setQrCode]     = useState(null);
   const [manualKey,  setManualKey]  = useState('');
   const [totpCode,   setTotpCode]   = useState('');
@@ -18,18 +24,7 @@ export default function SettingsPage() {
 
   const setLoad = (key, val) => setLoading((p) => ({ ...p, [key]: val }));
 
-  // â”€â”€ Load API keys + audit log on mount â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
-  useEffect(() => {
-    axios.get('/apikeys')
-      .then((r) => setApiKeys(r.data.data.apiKeys || []))
-      .catch(() => toast.error('Failed to load API keys'));
-
-    axios.get('/audit?limit=15')
-      .then((r) => setAuditLogs(r.data.data.logs || []))
-      .catch(() => toast.error('Failed to load audit log'));
-  }, []);
-
-  // â”€â”€ 2FA: Get QR code â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
+  // ── 2FA: Get QR code ──────────────────────────────────────────
   const handle2FASetup = async () => {
     setLoad('setup', true);
     try {
@@ -44,7 +39,7 @@ export default function SettingsPage() {
     }
   };
 
-  // â”€â”€ 2FA: Confirm QR scanned and enable â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
+  // ── 2FA: Confirm QR scanned and enable ────────────────────────
   const handle2FAEnable = async () => {
     if (totpCode.length !== 6) {
       toast.error('Enter the 6-digit code from Google Authenticator');
@@ -58,13 +53,13 @@ export default function SettingsPage() {
       setTotpCode('');
       toast.success('2FA enabled! Required on next login.');
     } catch (err) {
-      toast.error(err.response?.data?.message || 'Invalid code â€” try again');
+      toast.error(err.response?.data?.message || 'Invalid code – try again');
     } finally {
       setLoad('enable', false);
     }
   };
 
-  // â”€â”€ 2FA: Disable â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
+  // ── 2FA: Disable ──────────────────────────────────────────────
   const handle2FADisable = async () => {
     const code = window.prompt(
       'To disable 2FA, enter your current 6-digit Google Authenticator code:'
@@ -83,44 +78,34 @@ export default function SettingsPage() {
     }
   };
 
-  // â”€â”€ API Key: Create â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
+  // ── API Key: Create (via React Query mutation) ────────────────
   const handleCreateKey = async () => {
     if (!newKeyName.trim()) {
       toast.error('Enter a name for the key first');
       return;
     }
-    setLoad('createKey', true);
     try {
-      const { data } = await axios.post('/apikeys', {
+      const { data } = await createKey.mutateAsync({
         name:        newKeyName.trim(),
         permissions: ['read'],
       });
-      const { rawKey, ...keyMeta } = data.data.apiKey;
+      const rawKey = data.data.apiKey.rawKey;
       try {
         await navigator.clipboard.writeText(rawKey);
         toast.success(`Key created and copied!\nPrefix: ${rawKey.substring(0, 20)}...`, { duration: 7000 });
       } catch {
         window.alert(`Your API Key (copy this now — shown only once):\n\n${rawKey}`);
       }
-      setApiKeys((prev) => [...prev, keyMeta]);
       setNewKeyName('');
-    } catch (err) {
-      toast.error(err.response?.data?.message || 'Failed to create key');
-    } finally {
-      setLoad('createKey', false);
+    } catch {
+      // mutation onError already shows toast
     }
   };
 
-  // ── API Key: Revoke ────────────────────────────────────────────────
-  const handleRevokeKey = async (id, name) => {
+  // ── API Key: Revoke (via React Query mutation) ────────────────
+  const handleRevokeKey = (id, name) => {
     if (!window.confirm(`Revoke "${name}"?\nAny app using this key will immediately lose access.`)) return;
-    try {
-      await axios.delete(`/apikeys/${id}`);
-      setApiKeys((prev) => prev.filter((k) => k._id !== id));
-      toast.success('Key revoked');
-    } catch {
-      toast.error('Failed to revoke key');
-    }
+    revokeKey.mutate(id);
   };
 
   return (

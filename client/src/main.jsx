@@ -6,6 +6,7 @@ import { QueryClient, QueryClientProvider } from '@tanstack/react-query';
 import { ReactQueryDevtools } from '@tanstack/react-query-devtools';
 import { AuthProvider } from './context/AuthContext';
 import App from './App';
+import { SocketProvider } from './context/SocketContext';
 import './index.css';
 
 const queryClient = new QueryClient({
@@ -25,6 +26,7 @@ ReactDOM.createRoot(document.getElementById('root')).render(
     <QueryClientProvider client={queryClient}>
     <BrowserRouter>
       <AuthProvider>           {/* ← WRAP App with AuthProvider */}
+        <SocketProvider>
         <App />
         <Toaster
           position="bottom-right"
@@ -42,6 +44,7 @@ ReactDOM.createRoot(document.getElementById('root')).render(
             error:   { iconTheme: { primary: '#FF3CAC', secondary: '#0C1428' } },
           }}
         />
+        </SocketProvider>
       </AuthProvider>          {/* ← CLOSE AuthProvider */}
     </BrowserRouter>
     <ReactQueryDevtools initialIsOpen={false} />
