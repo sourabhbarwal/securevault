@@ -1,6 +1,7 @@
 import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
 import axios from '../api/axiosInstance';
 import toast from 'react-hot-toast';
+import { handleApiError } from '../utils/errorHandler';
 
 // ── QUERY KEYS — centralised so invalidation is consistent ──
 export const QUERY_KEYS = {
@@ -43,9 +44,7 @@ export function useCreateSecret() {
       qc.invalidateQueries({ queryKey: ['secrets'] });
       toast.success('Secret encrypted and stored!');
     },
-    onError: (err) => {
-      toast.error(err.response?.data?.message || 'Failed to create secret');
-    },
+    onError: (err) => handleApiError(err, 'Failed to create secret'),
   });
 }
 
@@ -58,9 +57,7 @@ export function useDeleteSecret() {
       qc.invalidateQueries({ queryKey: ['secrets'] });
       toast.success('Secret deleted');
     },
-    onError: () => {
-      toast.error('Delete failed');
-    },
+    onError: (err) => handleApiError(err, 'Delete failed'),
   });
 }
 
@@ -72,9 +69,7 @@ export function useUpdateSecret() {
     onSuccess: () => {
       qc.invalidateQueries({ queryKey: ['secrets'] });
     },
-    onError: () => {
-      toast.error('Update failed');
-    },
+    onError: (err) => handleApiError(err, 'Update failed'),
   });
 }
 
@@ -96,9 +91,7 @@ export function useCreateApiKey() {
     onSuccess: () => {
       qc.invalidateQueries({ queryKey: QUERY_KEYS.apiKeys });
     },
-    onError: (err) => {
-      toast.error(err.response?.data?.message || 'Failed to create key');
-    },
+    onError: (err) => handleApiError(err, 'Failed to create key'),
   });
 }
 
@@ -110,9 +103,7 @@ export function useRevokeApiKey() {
       qc.invalidateQueries({ queryKey: QUERY_KEYS.apiKeys });
       toast.success('Key revoked');
     },
-    onError: () => {
-      toast.error('Revoke failed');
-    },
+    onError: (err) => handleApiError(err, 'Revoke failed'),
   });
 }
 

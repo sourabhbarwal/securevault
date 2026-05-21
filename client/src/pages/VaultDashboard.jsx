@@ -5,6 +5,7 @@ import toast                                 from 'react-hot-toast';
 import { useAuth }                           from '../context/AuthContext';
 import axios                                 from '../api/axiosInstance';
 import { encryptSecret, decryptSecret }      from '../utils/encryption';
+import { handleApiError }                    from '../utils/errorHandler';
 
 export default function VaultDashboard() {
   const { aesKey, logout } = useAuth();
@@ -71,7 +72,7 @@ export default function VaultDashboard() {
       );
       setRevealed({ meta: secret, data: plain });
     } catch (err) {
-      toast.error(
+      handleApiError(err,
         err.name === 'OperationError'
           ? 'Decryption failed — log in again to restore your key'
           : 'Failed to load secret'
@@ -129,7 +130,7 @@ export default function VaultDashboard() {
       fetchSecrets();
       return true;
     } catch (err) {
-      toast.error(err.response?.data?.message || 'Failed to create secret');
+      handleApiError(err, 'Failed to create secret');
       return false;
     }
   };
@@ -141,7 +142,7 @@ export default function VaultDashboard() {
       setSecrets((prev) => prev.filter((s) => s._id !== id));
       setConfirmDel(null);
       toast.success('Secret deleted');
-    } catch { toast.error('Delete failed'); setConfirmDel(null); }
+    } catch (err) { handleApiError(err, 'Delete failed'); setConfirmDel(null); }
   };
 
 
@@ -152,7 +153,7 @@ export default function VaultDashboard() {
       setSecrets((prev) =>
         prev.map((s) => s._id === secret._id ? { ...s, isFavorite: !s.isFavorite } : s)
       );
-    } catch { toast.error('Update failed'); }
+    } catch (err) { handleApiError(err, 'Update failed'); }
   };
 
   // ── Category icon/colour map ───────────────────────────────

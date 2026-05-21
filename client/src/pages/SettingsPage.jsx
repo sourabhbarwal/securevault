@@ -4,6 +4,7 @@ import toast   from 'react-hot-toast';
 import { useAuth } from '../context/AuthContext';
 import axios   from '../api/axiosInstance';
 import { useApiKeys, useCreateApiKey, useRevokeApiKey, useAuditLogs } from '../hooks/useVault';
+import { handleApiError } from '../utils/errorHandler';
 
 export default function SettingsPage() {
   const { user, setUser, logout } = useAuth();
@@ -33,7 +34,7 @@ export default function SettingsPage() {
       setManualKey(data.data.manualKey);
       toast('Scan the QR code with Google Authenticator then enter the code below');
     } catch (err) {
-      toast.error(err.response?.data?.message || '2FA setup failed');
+      handleApiError(err, '2FA setup failed');
     } finally {
       setLoad('setup', false);
     }
@@ -53,7 +54,7 @@ export default function SettingsPage() {
       setTotpCode('');
       toast.success('2FA enabled! Required on next login.');
     } catch (err) {
-      toast.error(err.response?.data?.message || 'Invalid code – try again');
+      handleApiError(err, 'Invalid code – try again');
     } finally {
       setLoad('enable', false);
     }
@@ -72,7 +73,7 @@ export default function SettingsPage() {
       setUser((prev) => ({ ...prev, isTwoFactorEnabled: false }));
       toast.success('2FA disabled.');
     } catch (err) {
-      toast.error(err.response?.data?.message || 'Incorrect code');
+      handleApiError(err, 'Incorrect code');
     } finally {
       setLoad('disable', false);
     }

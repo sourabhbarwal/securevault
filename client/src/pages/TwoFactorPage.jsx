@@ -5,6 +5,7 @@ import { Shield, ArrowLeft } from 'lucide-react';
 import toast from 'react-hot-toast';
 import { useAuth } from '../context/AuthContext';
 import axios from '../api/axiosInstance';
+import { handleApiError } from '../utils/errorHandler';
 
 export default function TwoFactorPage() {
   const navigate          = useNavigate();
@@ -91,7 +92,7 @@ export default function TwoFactorPage() {
       navigate('/vault', { replace: true });
 
     } catch (err) {
-      toast.error(err.response?.data?.message || 'Invalid code. Try again.');
+      handleApiError(err, 'Invalid code. Try again.');
 
       // Shake animation to signal wrong code
       setShake(true);

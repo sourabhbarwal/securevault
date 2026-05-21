@@ -4,6 +4,7 @@
   import { useNavigate, Link } from 'react-router-dom';
   import toast from 'react-hot-toast';
   import axios from '../api/axiosInstance';
+  import { handleApiError } from '../utils/errorHandler';
 
   export default function RegisterPage() {
     const navigate = useNavigate();
@@ -49,7 +50,7 @@
       toast.success('Account created! Check your email to verify.');
       navigate('/login');
     } catch (err) {
-      toast.error(err.response?.data?.message || 'Registration failed');
+      handleApiError(err, 'Registration failed');
     } finally {
       setLoading(false);
     }

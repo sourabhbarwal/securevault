@@ -3,6 +3,7 @@ import { useState } from 'react';
 import { useNavigate, Link } from 'react-router-dom';
 import toast from 'react-hot-toast';
 import { useAuth } from '../context/AuthContext';
+import { handleApiError } from '../utils/errorHandler';
 
 export default function LoginPage() {
 const navigate   = useNavigate();
@@ -40,7 +41,7 @@ const handleSubmit = async (e) => {
     toast.success('Welcome back!');
     navigate('/vault');
   } catch (err) {
-    toast.error(err.response?.data?.message || 'Login failed. Check your credentials.');
+    handleApiError(err, 'Login failed. Check your credentials.');
   } finally {
     setLoading(false);
   }
@@ -118,9 +119,9 @@ const handleSubmit = async (e) => {
           </form>
           <div className="mt-10 pt-8 border-t border-outline-variant/10 text-center">
             <p className="text-on-surface-variant text-sm mb-4">New entity in the cosmos?</p>
-            <button className="px-6 py-2 rounded-lg border border-outline-variant/20 text-on-surface font-headline font-bold text-xs uppercase tracking-widest hover:bg-white/5 transition-colors">
+            <Link to="/register" className="px-6 py-2 rounded-lg border border-outline-variant/20 text-on-surface font-headline font-bold text-xs uppercase tracking-widest hover:bg-white/5 transition-colors inline-block">
               Create New Vault
-            </button>
+            </Link>
           </div>
         </div>
 
