@@ -12,8 +12,8 @@ export default function TwoFactorPage() {
   const location          = useLocation();
   const { completeLogin } = useAuth();
 
-  // userId and password are passed via navigate state from LoginPage
-  const { userId, password } = location.state || {};
+  // challengeToken and password are passed via navigate state from LoginPage
+  const { challengeToken, password } = location.state || {};
 
   const [digits,  setDigits]  = useState(['', '', '', '', '', '']);
   const [loading, setLoading] = useState(false);
@@ -23,8 +23,8 @@ export default function TwoFactorPage() {
 
   // If user navigated here directly without going through login — redirect
   useEffect(() => {
-    if (!userId) navigate('/login', { replace: true });
-  }, [userId, navigate]);
+    if (!challengeToken) navigate('/login', { replace: true });
+  }, [challengeToken, navigate]);
 
   // Auto-focus the first box on mount
   useEffect(() => {
@@ -76,7 +76,7 @@ export default function TwoFactorPage() {
     setLoading(true);
     try {
       const { data } = await axios.post('/auth/2fa/verify', {
-        userId,
+        challengeToken,
         totpToken: code,
       });
 

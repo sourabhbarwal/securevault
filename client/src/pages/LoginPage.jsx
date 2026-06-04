@@ -33,7 +33,7 @@ const handleSubmit = async (e) => {
 
     if (result?.requires2FA) {
       navigate('/verify-2fa', {
-        state: { userId: result.userId, password },
+        state: { challengeToken: result.challengeToken, password },
       });
       return;
     }

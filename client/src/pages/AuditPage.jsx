@@ -1,15 +1,9 @@
-import React, { useState, useEffect, useCallback, useRef } from 'react';
+import React, { useState, useEffect, useCallback } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
 import { useNavigate } from 'react-router-dom';
 import toast from 'react-hot-toast';
-import { useAuth } from '../context/AuthContext';
 import axios from '../api/axiosInstance';
-
-// ─── Token helper ─────────────────────────────────────────────────────────────
-const getLiveToken = () => {
-  const h = axios.defaults.headers.common['Authorization'] || '';
-  return h.startsWith('Bearer ') ? h.slice(7) : null;
-};
+import { useSocket } from '../context/SocketContext';
 
 // ─── Action colour map (Tailwind classes matching SettingsPage) ───────────────
 const ACTION_COLOR = {
@@ -112,7 +106,7 @@ function LogRow({ log, isNew = false }) {
 
 // ─── Main page ────────────────────────────────────────────────────────────────
 export default function AuditPage() {
-  const { accessToken } = useAuth();
+  const { connected, socket } = useSocket() || {};
   const navigate = useNavigate();
 
   const [actionFilter,  setActionFilter]  = useState('all');
@@ -123,10 +117,7 @@ export default function AuditPage() {
   const [page,          setPage]          = useState(1);
   const [fetching,      setFetching]      = useState(true);
   const [newEntries,    setNewEntries]    = useState([]);
-  const [connected,     setConnected]     = useState(false);
-  const esRef = useRef(null);
   const LIMIT   = 25;
-  const BASE_URL = import.meta.env.VITE_API_URL || 'http://localhost:5000/api';
 
   // ── Fetch paginated (with filters) ────────────────────────
   const fetchLogs = useCallback(async () => {
@@ -145,23 +136,18 @@ export default function AuditPage() {
 
   useEffect(() => { fetchLogs(); setNewEntries([]); }, [fetchLogs]);
 
-  // ── SSE stream ────────────────────────────────────────────
+  // Live updates arrive through the authenticated Socket.IO connection.
   useEffect(() => {
-    const token = getLiveToken() || accessToken;
-    if (!token) return;
-    const es = new EventSource(`${BASE_URL}/audit/stream?token=${encodeURIComponent(token)}`);
-    esRef.current = es;
-    es.onopen    = ()  => setConnected(true);
-    es.onerror   = ()  => setConnected(false);
-    es.onmessage = (e) => {
-      try {
-        const log = JSON.parse(e.data);
-        setNewEntries((p) => [log, ...p].slice(0, 50));
-        setTotal((t) => t + 1);
-      } catch {/* ignore */}
+    if (!socket) return undefined;
+
+    const onNewLog = (log) => {
+      setNewEntries((p) => [log, ...p].slice(0, 50));
+      setTotal((t) => t + 1);
     };
-    return () => { es.close(); setConnected(false); };
-  }, [accessToken, BASE_URL]);
+
+    socket.on('audit:new', onNewLog);
+    return () => socket.off('audit:new', onNewLog);
+  }, [socket]);
 
   // ── Exports ───────────────────────────────────────────────
   const allVisible = [...newEntries, ...logs];

@@ -21,9 +21,29 @@ export default function SettingsPage() {
   const [manualKey,  setManualKey]  = useState('');
   const [totpCode,   setTotpCode]   = useState('');
   const [newKeyName, setNewKeyName] = useState('');
+  const [newKeyPermissions, setNewKeyPermissions] = useState(['read', 'write']);
+  const [copyableKeys, setCopyableKeys] = useState({});
   const [loading,    setLoading]    = useState({});
 
   const setLoad = (key, val) => setLoading((p) => ({ ...p, [key]: val }));
+
+  const togglePermission = (permission) => {
+    setNewKeyPermissions((prev) => {
+      if (permission === 'read') return ['read', ...prev.filter((p) => p !== 'read')];
+      return prev.includes(permission)
+        ? prev.filter((p) => p !== permission)
+        : [...prev, permission];
+    });
+  };
+
+  const copyText = async (value, label = 'Value') => {
+    try {
+      await navigator.clipboard.writeText(value);
+      toast.success(`${label} copied`);
+    } catch {
+      window.prompt(`Copy ${label}:`, value);
+    }
+  };
 
   // ── 2FA: Get QR code ──────────────────────────────────────────
   const handle2FASetup = async () => {
@@ -85,21 +105,26 @@ export default function SettingsPage() {
       toast.error('Enter a name for the key first');
       return;
     }
+    setLoad('createKey', true);
     try {
       const { data } = await createKey.mutateAsync({
         name:        newKeyName.trim(),
-        permissions: ['read'],
+        permissions: newKeyPermissions,
       });
       const rawKey = data.data.apiKey.rawKey;
+      const keyId = data.data.apiKey._id;
+      setCopyableKeys((prev) => ({ ...prev, [keyId]: rawKey }));
       try {
         await navigator.clipboard.writeText(rawKey);
-        toast.success(`Key created and copied!\nPrefix: ${rawKey.substring(0, 20)}...`, { duration: 7000 });
+        toast.success('Key created and copied. You can copy it again below.', { duration: 7000 });
       } catch {
         window.alert(`Your API Key (copy this now — shown only once):\n\n${rawKey}`);
       }
       setNewKeyName('');
     } catch {
       // mutation onError already shows toast
+    } finally {
+      setLoad('createKey', false);
     }
   };
 
@@ -257,16 +282,46 @@ export default function SettingsPage() {
               </button>
             </div>
 
+            <div className="flex flex-wrap gap-2 mb-6">
+              {[
+                { value: 'read', label: 'Read' },
+                { value: 'write', label: 'Write' },
+                { value: 'delete', label: 'Delete' },
+              ].map(({ value, label }) => {
+                const active = newKeyPermissions.includes(value);
+                const locked = value === 'read';
+                return (
+                  <button
+                    key={value}
+                    type="button"
+                    onClick={() => togglePermission(value)}
+                    className={`px-3 py-2 rounded-lg border text-xs font-bold uppercase tracking-wider transition-all active:scale-95
+                      ${active
+                        ? 'bg-primary/10 text-primary border-primary/25'
+                        : 'border-white/10 text-outline hover:border-white/20 hover:text-on-surface'}
+                      ${locked ? 'cursor-default' : ''}`}
+                    title={locked ? 'Read permission is always included' : `Toggle ${label} permission`}
+                  >
+                    {active ? '✓ ' : ''}{label}
+                  </button>
+                );
+              })}
+            </div>
+
             {/* Key list */}
             {apiKeys.length === 0 ? (
               <div className="text-center py-10 text-outline text-sm">No API keys yet. Create one above.</div>
             ) : (
               <div className="flex flex-col divide-y divide-white/5">
-                {apiKeys.map((key) => (
+                {apiKeys.map((key) => {
+                  const rawKey = copyableKeys[key._id];
+                  return (
                   <div key={key._id} className="flex items-center gap-4 py-4 group">
                     <div className="flex-1 min-w-0">
                       <p className="font-bold text-on-surface text-sm truncate">{key.name}</p>
-                      <code className="text-xs text-outline font-mono">{key.keyPrefix}</code>
+                      <code className="text-xs text-outline font-mono break-all">
+                        {rawKey || key.keyPrefix}
+                      </code>
                     </div>
                     <div className="hidden sm:flex gap-1 shrink-0">
                       {(key.permissions || []).map((p) => (
@@ -281,13 +336,24 @@ export default function SettingsPage() {
                       </span>
                     )}
                     <button
+                      onClick={() => copyText(rawKey || key.keyPrefix, rawKey ? 'API key' : 'Key prefix')}
+                      className={`px-3 py-1.5 rounded-lg border text-xs font-bold active:scale-95 transition-all shrink-0
+                        ${rawKey
+                          ? 'bg-primary/10 text-primary border-primary/20 hover:bg-primary/20'
+                          : 'bg-white/5 text-outline border-white/10 hover:border-white/20'}`}
+                      title={rawKey ? 'Copy full API key' : 'Full key is only available immediately after creation'}
+                    >
+                      Copy
+                    </button>
+                    <button
                       onClick={() => handleRevokeKey(key._id, key.name)}
                       className="px-3 py-1.5 rounded-lg bg-error/10 text-error border border-error/20 text-xs font-bold hover:bg-error/20 active:scale-95 transition-all shrink-0"
                     >
                       Revoke
                     </button>
                   </div>
-                ))}
+                  );
+                })}
               </div>
             )}
           </section>
