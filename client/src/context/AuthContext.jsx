@@ -7,7 +7,7 @@ const AuthContext = createContext(null);
 export function AuthProvider({ children }) {
   const [user,    setUser]    = useState(null);
   const [aesKey,  setAesKey]  = useState(null);
-  const [token,   setToken]   = useState(null);   // raw JWT for SSE EventSource
+  const [token,   setToken]   = useState(null);
   const [loading, setLoading] = useState(true);
 
   useEffect(() => {
@@ -40,7 +40,7 @@ export function AuthProvider({ children }) {
     const { data } = await axios.post('/auth/login', { email, password });
 
     if (data.data?.requires2FA) {
-      return { requires2FA: true, userId: data.data.userId };
+      return { requires2FA: true, challengeToken: data.data.challengeToken };
     }
 
     const { accessToken, user: userData, encryptionSalt } = data.data;

@@ -53,7 +53,6 @@ instance.interceptors.response.use(
         const newToken = data.data.accessToken;
 
         instance.defaults.headers.common['Authorization'] = `Bearer ${newToken}`;
-        window.__svToken = newToken;
         refreshQueue.forEach(({ resolve }) => resolve(newToken));
         refreshQueue = [];
 

@@ -6,16 +6,12 @@ import { useQueryClient } from '@tanstack/react-query';
 const SocketContext = createContext(null);
 
 export function SocketProvider({ children }) {
-  const { user }      = useAuth();
+  const { user, accessToken } = useAuth();
   const qc            = useQueryClient();
   const socketRef     = useRef(null);
   const [connected, setConnected] = useState(false);
 
   useEffect(() => {
-    // Get access token from axios defaults
-    const token = document.cookie; // fallback
-    const authHeader = window._axiosToken; // set by axiosInstance
-
     if (!user) {
       // Disconnect if user logs out
       if (socketRef.current) {
@@ -26,14 +22,12 @@ export function SocketProvider({ children }) {
       return;
     }
 
-    // Get token from axios defaults
-    const axiosToken = window.__svToken;
-    if (!axiosToken) return;
+    if (!accessToken) return;
 
     const socket = io(
       import.meta.env.VITE_API_URL?.replace('/api', '') || 'http://localhost:5000',
       {
-        auth:        { token: axiosToken },
+        auth:        { token: accessToken },
         transports:  ['websocket'],
         reconnection: true,
         reconnectionAttempts: 5,
@@ -80,7 +74,7 @@ export function SocketProvider({ children }) {
       socket.disconnect();
       socketRef.current = null;
     };
-  }, [user, qc]);
+  }, [user, accessToken, qc]);
 
   return (
     <SocketContext.Provider value={{ connected, socket: socketRef.current }}>

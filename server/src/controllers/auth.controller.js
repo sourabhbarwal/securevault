@@ -1,10 +1,10 @@
 const bcrypt      = require('bcryptjs');
 const User        = require('../models/User.model');
+const RefreshToken = require('../models/RefreshToken.model');
 const ApiResponse = require('../utils/apiResponse');
 const tokenService = require('../services/token.service');
 const emailService = require('../services/email.service');
 const auditService = require('../services/audit.service');
-const { validationResult } = require('express-validator');
 
 // ── Helper: set refresh token as HttpOnly cookie ──────────
 const setRefreshCookie = (res, token) => {
@@ -17,23 +17,37 @@ const setRefreshCookie = (res, token) => {
 };
 
 // ── Helper: find user by raw refresh token ────────────────
-const findUserByRefreshToken = async (rawToken) => {
-  const users = await User.find({ refreshTokens: { $not: { $size: 0 } } });
-  for (const user of users) {
-    for (const hashed of user.refreshTokens) {
-      if (await tokenService.compareRefreshToken(rawToken, hashed)) return user;
-    }
+const createRefreshSession = async (userId, rawToken) => {
+  await RefreshToken.create({
+    userId,
+    tokenHash: tokenService.hashRefreshTokenForLookup(rawToken),
+    expiresAt: new Date(Date.now() + 7 * 24 * 60 * 60 * 1000),
+  });
+
+  const sessions = await RefreshToken.find({ userId }).sort({ createdAt: -1 }).skip(5).select('_id');
+  if (sessions.length) {
+    await RefreshToken.deleteMany({ _id: { $in: sessions.map((session) => session._id) } });
   }
-  return null;
+};
+
+const findRefreshSession = (rawToken) => RefreshToken.findOne({
+  tokenHash: tokenService.hashRefreshTokenForLookup(rawToken),
+  expiresAt: { $gt: new Date() },
+});
+
+const revokeRefreshSession = (rawToken) => RefreshToken.deleteOne({
+  tokenHash: tokenService.hashRefreshTokenForLookup(rawToken),
+});
+
+const revokeAllRefreshSessions = (userId) => {
+  if (!userId) return Promise.resolve();
+  return RefreshToken.deleteMany({ userId });
 };
 
 // ══════════════════════════════════════════════════════════
 // REGISTER — POST /api/auth/register
 // ══════════════════════════════════════════════════════════
 exports.register = async (req, res) => {
-  const errors = validationResult(req);
-  if (!errors.isEmpty()) return ApiResponse.error(res, 'Validation failed', 400, errors.array());
-
   const { email, password } = req.body;
   try {
     if (await User.findOne({ email })) return ApiResponse.error(res, 'Email already registered', 409);
@@ -74,9 +88,6 @@ exports.verifyEmail = async (req, res) => {
 // LOGIN — POST /api/auth/login
 // ══════════════════════════════════════════════════════════
 exports.login = async (req, res) => {
-  const errors = validationResult(req);
-  if (!errors.isEmpty()) return ApiResponse.error(res, 'Validation failed', 400, errors.array());
-
   const { email, password } = req.body;
   try {
     const user = await User.findOne({ email });
@@ -88,15 +99,13 @@ exports.login = async (req, res) => {
 
     // If 2FA enabled → don't issue tokens yet, ask client to send TOTP code
     if (user.isTwoFactorEnabled) {
-      return ApiResponse.success(res, { requires2FA: true, userId: user._id }, '2FA code required');
+      const challengeToken = tokenService.generate2FAChallengeToken(user._id);
+      return ApiResponse.success(res, { requires2FA: true, challengeToken }, '2FA code required');
     }
 
     const accessToken  = tokenService.generateAccessToken(user._id);
     const refreshToken = tokenService.generateRefreshToken();
-    const hashedRefresh = await tokenService.hashRefreshToken(refreshToken);
-    user.refreshTokens.push(hashedRefresh);
-    if (user.refreshTokens.length > 5) user.refreshTokens = user.refreshTokens.slice(-5);
-    await user.save();
+    await createRefreshSession(user._id, refreshToken);
 
     setRefreshCookie(res, refreshToken);
     await auditService.log(user._id, 'LOGIN', req);
@@ -116,8 +125,14 @@ exports.refreshToken = async (req, res) => {
   const { refreshToken } = req.cookies;
   if (!refreshToken) return ApiResponse.error(res, 'No refresh token', 401);
   try {
-    const user = await findUserByRefreshToken(refreshToken);
+    const session = await findRefreshSession(refreshToken);
+    if (!session) {
+      res.clearCookie('refreshToken');
+      return ApiResponse.error(res, 'Invalid refresh token', 403);
+    }
+    const user = await User.findById(session.userId);
     if (!user) {
+      await revokeRefreshSession(refreshToken);
       res.clearCookie('refreshToken');
       return ApiResponse.error(res, 'Invalid refresh token', 403);
     }
@@ -131,17 +146,8 @@ exports.refreshToken = async (req, res) => {
 exports.logout = async (req, res) => {
   const { refreshToken } = req.cookies;
   try {
-    if (refreshToken && req.userId) {
-      const user = await User.findById(req.userId);
-      if (user) {
-        const updated = [];
-        for (const h of user.refreshTokens) {
-          if (!(await tokenService.compareRefreshToken(refreshToken, h))) updated.push(h);
-        }
-        user.refreshTokens = updated;
-        await user.save();
-      }
-    }
+    if (refreshToken) await revokeRefreshSession(refreshToken);
+    else await revokeAllRefreshSessions(req.userId);
     res.clearCookie('refreshToken');
     await auditService.log(req.userId, 'LOGOUT', req);
     return ApiResponse.success(res, null, 'Logged out');
@@ -205,12 +211,13 @@ exports.enable2FA = async (req, res) => {
 // ══════════════════════════════════════════════════════════
 // VERIFY 2FA LOGIN — POST /api/auth/2fa/verify
 // Called after password login when 2FA is enabled
-// Body: { userId, totpToken }   ← no JWT needed yet
+// Body: { challengeToken, totpToken }   ← no JWT needed yet
 // ══════════════════════════════════════════════════════════
 exports.verify2FALogin = async (req, res) => {
-  const { userId, totpToken } = req.body;
-  if (!userId || !totpToken) return ApiResponse.error(res, 'userId and totpToken required', 400);
+  const { challengeToken, totpToken } = req.body;
+  if (!challengeToken || !totpToken) return ApiResponse.error(res, 'challengeToken and totpToken required', 400);
   try {
+    const { userId } = tokenService.verify2FAChallengeToken(challengeToken);
     const user = await User.findById(userId);
     if (!user?.isTwoFactorEnabled) return ApiResponse.error(res, 'Invalid request', 400);
 
@@ -221,10 +228,7 @@ exports.verify2FALogin = async (req, res) => {
 
     const accessToken   = tokenService.generateAccessToken(user._id);
     const refreshToken  = tokenService.generateRefreshToken();
-    const hashedRefresh = await tokenService.hashRefreshToken(refreshToken);
-    user.refreshTokens.push(hashedRefresh);
-    if (user.refreshTokens.length > 5) user.refreshTokens = user.refreshTokens.slice(-5);
-    await user.save();
+    await createRefreshSession(user._id, refreshToken);
 
     setRefreshCookie(res, refreshToken);
     await auditService.log(user._id, 'LOGIN', req);
